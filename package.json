@@ -11,6 +11,7 @@
     "angular-messages": "^1.5.1",
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
+    "mongodb": "^2.1.14",
     "regex": "^0.1.1",
     "socket.io": "^1.4.5",
     "socket.io-client": "^1.4.5"
