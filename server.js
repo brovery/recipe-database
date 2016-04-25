@@ -7,7 +7,8 @@ var assert = require('assert');
 
 var url = 'mongodb://localhost:27017/recipes';
 
-
+// The setupDatabase function call will set up a basic database structure with test data. Uncomment it if you want the basic structure set up.
+//setupDatabase();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -44,16 +45,15 @@ app.get('/api/getRecipes', (req, res) => {
 
     for (var i = 0; i < recipes.length; i++) {
         for (var j = 0; j < ratings.length; j++) {
-            if (recipes[i]._id == ratings[j].rec_id) {
+            if (JSON.stringify(recipes[i]._id) == JSON.stringify(ratings[j].rec_id)) {
                 count++;
                 sum += ratings[j].rating;
-            } 
+            }
         }
         recipes[i].rating = (sum / count);
         sum = 0;
         count = 0;
     }
-    
     res.send(recipes);
 });
 
@@ -97,3 +97,46 @@ app.post('/api/addBook', (req, res) => {
 app.listen(3000, function() {
     console.log('App listening on port 3000');
 });
+
+// This function will create a basic database structure for testing purposes.
+function setupDatabase() {
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+        var newRecipe = {
+            category: "Appetizer",
+            cookTime: 215,
+            image: "img/Lets-get-cooking.png",
+            ingredients: [
+                {ingredient: "Ha", qty: "1"}
+            ],
+            instructions: [
+                {instruction: "asdf"}
+            ],
+            name: "long cooktime",
+            prepTime: 175,
+            private: false,
+            userName: "Brandon O'Very"
+        };
+
+        var newRating = {
+            userId: 1,
+            rec_id: "1",
+            rating: 5
+        };
+
+        var collection = db.collection('recipes');
+
+        collection.insertOne(newRecipe, function(err, docs) {
+            assert.equal(err, null);
+            recipes = docs;
+            newRating.rec_id = docs.ops[0]._id;
+
+            var collection2 = db.collection('ratings');
+
+            collection2.insertOne(newRating, function(err, docs) {
+                assert.equal(err, null);
+                db.close();
+            });
+        });
+    });
+}
