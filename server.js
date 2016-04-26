@@ -23,19 +23,19 @@ MongoClient.connect(url, function(err, db) {
     console.log("Connected correctly to database");
     
     var collection = db.collection('recipes');
+    var collection2 = db.collection('ratings');
     
     collection.find({}).toArray(function(err, docs) {
         assert.equal(err, null);
         recipes = docs;
+        collection2.find({}).toArray(function(err, docs2) {
+            assert.equal(err, null);
+            ratings = docs2;
+            db.close();
+        });
     });
     
-    var collection2 = db.collection('ratings');
 
-    collection2.find({}).toArray(function(err, docs) {
-        assert.equal(err, null);
-        ratings = docs;
-        db.close();
-    });
 
 });
 
