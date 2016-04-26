@@ -1,0 +1,101 @@
+<!-- Navigation Bar -->
+<nav role="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a ui-sref="home" class="navbar-brand">Ghzuzaq</a>
+        </div>
+        <!-- Collection of nav links and other content for toggling -->
+        <div id="navbarCollapse" class="collapse navbar-collapse" ng-controller="navController as nav">
+            <ul class="nav navbar-nav">
+                <li ng-class="{ active: nav.isActive('/home')}">
+                    <a ui-sref="home" data-toggle="collapse" data-target=".navbar-collapse.in">Home</a></li>
+                <li ng-show="nav.loggedin.loggedin" ng-class="{ active: nav.isActive('/newRecipe')}">
+                    <a ui-sref="newRecipe" data-toggle="collapse" data-target=".navbar-collapse.in">Add Recipe</a></li>
+                <li ng-show="nav.loggedin.loggedin" ng-class="{ active: nav.isActive('/myCookBook')}">
+                    <a ui-sref="myCookBook" data-toggle="collapse" data-target=".navbar-collapse.in">My Cookbook</a>
+                <li ng-class="{ active: nav.isActive('/login')}">
+                    <a ui-sref="login" data-toggle="collapse" data-target=".navbar-collapse.in">Create/Edit Account</a>
+                </li>
+                <li ng-class="{ active: nav.isActive('/about')}">
+                    <a ui-sref="about" data-toggle="collapse" data-target=".navbar-collapse.in">About</a></li>
+            </ul>
+            <div class="col-sm-4">
+                <div id="imaginary_container">
+                    <div class="input-group stylish-input-group">
+                        <input type="search" class="form-control" ng-blur="nav.blurit()" ng-focus="nav.showSearch=true"  placeholder="Search Ingredient" ng-model="search.ingredients.ingredient">
+                    </div>
+                    <ul ng-show="nav.showSearch">
+                        <div ng-repeat="recipe in nav.recipes | filter:search | filter:{private: false}">
+                            <a href="#/{{recipe.$id}}">
+                                <li>
+                                    {{recipe.name}}
+                                </li>
+                            </a>
+                        </div>
+
+                    </ul>
+
+                </div>
+            </div>
+
+            <!--login drop down-->
+            <div ng-controller="loginController as lc" class="btn-group dropdown navbar-right">
+                <button class="btn btn-primary dropdown-toggle" type="button"
+                        data-toggle="dropdown" ng-bind="lc.loginName" ng-click="lc.deleteData()">
+                    <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <input ng-model="lc.email" type="email" placeholder="Email">
+                    </li>
+                    <li>
+                        <input ng-model="lc.password" type="password" placeholder="Password">
+                    </li>
+                    <li>
+                        <button ng-click="lc.nativeLogin()" class="btn btn-primary">Login</button>
+                    </li>
+                    <hr>
+                    <li>
+                        <a ng-click="lc.genericLogin('google')">
+                            <img src="img/googleg_standard_color_128dp.png" style="width: 30px;">
+                        </a>
+                        <a ng-click="lc.genericLogin('github')">
+                            <img src="img/GitHub.png" style="width: 30px;">
+                        </a>
+                    </li>
+                </ul>
+                <img ng-if="lc.loginHideGoogle" id="loginImage" ng-src="{{ lc.loginImage }}">
+                <!--<img ng-if="lc.loginHideGithub" ng-src="{{ lc.ghData.github.profileImageURL }}" style="width: 30px;">-->
+                <div ng-if="lc.loginHideNative" id="loginDef">{{lc.email}}</div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" data-backdrop="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Oops</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    Enter valid email and password
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

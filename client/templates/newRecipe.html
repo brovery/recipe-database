@@ -1,0 +1,119 @@
+<div spellcheck="true">
+    <h2 align="center">Add New Recipe</h2>
+
+
+    <div>
+        Name:
+        <input type="text" style="width: 300px" placeholder="Mama's Healthy Meatloaf" ng-model="nc.name"/>
+    </div>
+
+    <br/>
+
+    <div>
+        <button class="btn btn-primary" ng-click="nc.ingredients.push({name:'', qty:''})">Add Ingredient</button>
+
+        <div ng-repeat="ingredient in nc.ingredients">
+            <input type="text" placeholder="Name" ng-model="ingredient.name"/>
+            <input type="text" placeholder="Quantity" ng-model="ingredient.qty"/>
+            <span class="glyphicon glyphicon-remove" ng-click="nc.removeIng($index)" aria-hidden="true"></span>
+        </div>
+
+    </div>
+
+    <br/>
+
+    <div>
+        <button class="btn btn-primary" ng-click="nc.instructions.push({name:'', step:''})">Add Instructions</button>
+
+        <div ng-repeat="(rowIndex, instruction) in nc.instructions">
+            Step {{rowIndex + 1}}:
+            <input style="width: 300px" type="text" placeholder="Instruction" ng-model="instruction.name"/>
+            <span class="glyphicon glyphicon-remove" ng-click="nc.removeIns($index)" aria-hidden="true"></span>
+        </div>
+
+    </div>
+    <br/>
+
+    <div>
+        Time to Prep:
+        <input type="number" placeholder="minutes" ng-model="nc.prepTime"/>
+    </div>
+    <br/>
+
+    <div>
+        Time to Cook:
+        <input type="number" placeholder="minutes" ng-model="nc.cookTime"/>
+    </div>
+    <br/>
+
+    <div>
+        Course:
+        <select name="category" id="cat" ng-model="nc.category">
+            <option value="Appetizer">Appetizer</option>
+            <option value="Entree">Entree</option>
+            <option value="Dessert">Dessert</option>
+        </select>
+
+    </div>
+    <br/>
+    <div class="radio">
+        <label><input type="radio" name="optradio" value="false" ng-model="nc.privacy">Public</label>
+    </div>
+    <div class="radio">
+        <label><input type="radio" name="optradio" value="true" ng-model="nc.privacy">Private</label>
+    </div>
+    <br/>
+
+    <div>Added by:
+        <span ng-bind="nc.userName" ng-show="nc.editHide"></span>
+        <input type="text" ng-model="nc.userName" ng-hide="nc.editHide"/>
+        <span class="glyphicon glyphicon-pencil" ng-click="nc.editName()" aria-hidden="true"></span>
+
+    </div>
+
+
+    <h5 ng-inIt>Upload an Image</h5>
+    <button ngf-select
+            class="btn btn-primary"
+            type="file"
+            ngf-change="nc.addPost($file)"
+            ng-model="nc.file"
+            ngf-resize="{width: 300, height: 300, centerCrop: true}"
+            ngf-accept="'image/*'"
+            ng-model-rejected="rejFiles"
+            ngf-change="nc.imageChange(nc.files, rejFiles)">
+        <!--     ngf-validate="{size: {max: '2MB', min: '10B'}, height: {max: 1200}, width: {max: 1200}, duration: {max: '5m'}}" -->
+
+        Select File
+    </button>
+
+    <img ngf-src="nc.imageShow"/>
+    {{nc.wrongFile}}
+
+    <br/><br/>
+    <button type="button" class="btn btn-primary" ng-click="nc.createRecipe()" data-toggle="modal"
+            data-target="#successModal">Submit
+    </button>
+
+
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Recipe successfully submitted!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>

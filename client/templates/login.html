@@ -1,0 +1,98 @@
+<br>
+<!--Native login-->
+<!--<div>-->
+<!--<input ng-model="lc.email" type="text" typeof="Email" placeholder="Email">-->
+<!--<input ng-model="lc.password" type="text" placeholder="Password">-->
+<!--<button ng-click="lc.nativeLogin()">Login</button>-->
+<!--</div>-->
+<!--<br>-->
+
+<!--Google login-->
+<!--<div>-->
+
+<!--<button ng-click="lc.googleLogin()">Log in with Google</button>-->
+<!--<button ng-click="lc.deleteGoogleData()">Delete data</button>-->
+<!--<a href='https://www.google.com/'>Go to Google</a><br/>-->
+<!--<br/>-->
+<!--<div>{{ lc.message }}</div>-->
+<!--<br/>-->
+
+<!-- click profile pic to display raw data from Google -->
+<!--<div>{{ lc.gData.google.displayName }}</div>-->
+<!--<div ng-click="lc.showData=!lc.showData">-->
+<!--<img ng-show="lc.gData.google.profileImageURL" ng-src="{{ lc.gData.google.profileImageURL }}">-->
+<!--</div>-->
+<!--<pre ng-show="lc.showData" ng-bind="lc.gData.google | json"></pre>-->
+
+<!--</div>-->
+<!--<br>-->
+
+<!--Create native user-->
+<div>
+    <span>If this is your first time, create an account here</span>
+    <br>
+    <input ng-model="lc.createEmail" type="email" placeholder="Email">
+    <input ng-model="lc.createPassword" type="password" placeholder="Password">
+    <button ng-click="lc.create()" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Create User
+    </button>
+</div>
+<br>
+
+<!--Change email-->
+<div>
+    <span>Change your email here</span>
+    <br>
+    <input ng-model="lc.oldEmail" type="text" typeof="Email" placeholder="Old Email">
+    <input ng-model="lc.newEmail" type="text" typeof="Email" placeholder="New Email">
+    <input ng-model="lc.password" type="password" placeholder="Password">
+    <button ng-click="lc.changeEmail()" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Change
+        Email
+    </button>
+</div>
+<br>
+
+<!--Change password-->
+<div>
+    <span>Change your password here</span>
+    <br>
+    <input ng-model="lc.email" type="text" typeof="Email" placeholder="Email">
+    <input ng-model="lc.oldPassword" type="password" typeof="Email" placeholder="Old Password">
+    <input ng-model="lc.newPassword" type="password" placeholder="New Password">
+    <button ng-click="lc.changePassword()" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Change
+        Password
+    </button>
+</div>
+<br>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 ng-show="lc.successHide" class="modal-title">Success!</h4>
+                <h4 ng-show="lc.failHide" class="modal-title">Oops</h4>
+            </div>
+            <div class="modal-body">
+                <div ng-show="lc.successHide">
+                    It worked!
+                </div>
+                <div ng-show="lc.failLoginHide">
+                    Enter valid email and password
+                </div>
+                <div ng-show="lc.passFail">
+                    Password change failed
+                </div>
+                <div ng-show="lc.emailFail">
+                    Email change failed
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
