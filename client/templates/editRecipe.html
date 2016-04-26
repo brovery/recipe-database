@@ -1,0 +1,73 @@
+<div class="alert alert-info row">
+    <h3>Edit Recipe Page</h3>
+    <div class="form-group">
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label for="recipeName" class="col-sm-2">Recipe Name</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="recipeName" ng-model="ec.curRecipe.name">
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="optionsRadios" value="false" ng-model="ec.curRecipe.private">
+                    Public
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="optionsRadios" value="true" ng-model="ec.curRecipe.private">
+                    Private
+                </label>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label for="prepTime" class="col-sm-1">Prep Time (minutes)</label>
+                <div class="col-sm-5">
+                    <input id="prepTime" type="number" ng-model="ec.curRecipe.prepTime"/>
+                </div>
+                <label for="cookTime" class="col-sm-1">Cook Time</label>
+                <div class="col-sm-5">
+                    <input id="cookTime" type="number" ng-model="ec.curRecipe.cookTime"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-horizontal" ng-repeat="ingredient in ec.curRecipe.ingredients">
+            <div class="form-group">
+                <label for="ingredientName" class="col-sm-1 control-label">Name</label>
+                <div class="col-sm-5">
+                    <input id="ingredientName" type="text" class="form-control" ng-model="ingredient.ingredient"/>
+                </div>
+                <label for="ingredientQuantity" class="col-sm-1 control-label">Quantity</label>
+                <div class="col-sm-5">
+                    <input id="ingredientQuantity" type="text" class="form-control" ng-model="ingredient.qty"/>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" ng-click="ec.curRecipe.ingredients.push({ingredient:'', qty:''})">Add Ingredient</button>
+        <br>
+        <div class="form-horizontal" ng-repeat="instruction in ec.curRecipe.instructions">
+            <div class="form-group">
+                <label for="instruction" class="col-sm-1 control-label">Instruction</label>
+                <div class="col-sm-11">
+                    <textarea id="instruction" type="text" class="form-control" ng-model="instruction.instruction"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" ng-click="ec.curRecipe.instructions.push({instruction:''})">Add Instruction</button>
+
+    <!--<div class="col-sm-6">-->
+        <!--<img width="100%" ng-src={{rc.recipe.image}} alt="Image of dish">-->
+    <!--</div>-->
+
+
+    <button class="btn btn-warning pull-right" ng-click="ec.editRecipe()">Submit</button>
+</div>
