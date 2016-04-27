@@ -17,7 +17,7 @@
 
         // define functions
         function getMoreRecipes() {
-            hc.displayRecipes = hc.recipes.slice(0,hc.displayRecipes.length + 4);
+            hc.displayRecipes = hc.recipes//.slice(0,hc.displayRecipes.length + 4);
         }
 
         function getRating(key) {
