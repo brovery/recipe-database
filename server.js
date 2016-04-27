@@ -39,9 +39,6 @@ MongoClient.connect(url, function(err, db) {
             });
         });
     });
-    
-
-
 });
 
 app.get('/api/getRecipes', (req, res) => {
@@ -60,7 +57,7 @@ app.get('/api/getRecipes', (req, res) => {
         sum = 0;
         count = 0;
     }
-    console.log(recipes);
+    console.log("Sending recipes");
     res.send(recipes);
 });
 

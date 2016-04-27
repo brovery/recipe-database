@@ -22,8 +22,8 @@
 
         console.log(rc.recipe);
 
-
         if (rc.recipe == undefined) {
+            console.log("hehe");
             rc.recipe = $localStorage.curRecipe;
         }
 
