@@ -8,7 +8,7 @@ var assert = require('assert');
 var url = 'mongodb://localhost:27017/recipes';
 
 // The setupDatabase function call will set up a basic database structure with test data. Uncomment it if you want the basic structure set up.
-//setupDatabase();
+// setupDatabase();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -47,7 +47,8 @@ MongoClient.connect(url, function(err, db) {
 app.get('/api/getRecipes', (req, res) => {
     var count = 0; 
     var sum = 0;
-console.log('getting recipes');
+
+    // console.log('getting recipes');
     for (var i = 0; i < recipes.length; i++) {
         for (var j = 0; j < ratings.length; j++) {
             if (JSON.stringify(recipes[i]._id) == JSON.stringify(ratings[j].rec_id)) {
