@@ -1,7 +1,7 @@
 <div class="alert alert-warning row">
 
     <h1>This is my cookbook page!</h1>
-    <div ng-repeat="recipe in mcc.recipes | cookbook">
+    <div ng-repeat="recipe in mcc.recipes.data"> <!--| cookbook-->
         <div class="col-lg-3 col-md-4 col-xs-6 thumb">
             <h4><span ng-bind="recipe.name"></span></h4>
             <a href="#/{{recipe.$id}}">

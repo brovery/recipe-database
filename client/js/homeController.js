@@ -11,7 +11,7 @@
         // list everything
         var hc = this;
         hc.recipes = recipeService.recipes;
-        hc.displayRecipes = hc.recipes.slice(0,4);
+        hc.displayRecipes = hc.recipes//.slice(0,4);
         hc.getMoreRecipes = getMoreRecipes;
         hc.getRating = getRating;
 
