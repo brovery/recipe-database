@@ -68,8 +68,12 @@ app.get('/api/getCookbook', (req, res) => {
     var myCookbook = [];
 
     for (var i = 0; i < cookbook.length; i++) {
-        if (cookbook[i])
+        if (cookbook[i].user_id == user_id) {
+            myCookbook.push(cookbook[i]);
+        }
     }
+
+    res.send(myCookbook);
 });
 
 app.post('/api/addRecipe', (req, res) => {
