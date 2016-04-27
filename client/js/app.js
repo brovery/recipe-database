@@ -62,10 +62,11 @@
                         controller: "recipeController as rc",
                         resolve: {
                             recipe: function ($stateParams, recipeService, $localStorage) {
-                                for (var i = 0; i < recipeService.recipes.length; i++) {
-                                    if (recipeService.recipes[i].$id == $stateParams.id) {
-                                        $localStorage.curRecipe = recipeService.recipes[i];
-                                        return recipeService.recipes[i];
+                                console.log(recipeService.recipes.data);
+                                for (var i = 0; i < recipeService.recipes.data.length; i++) {
+                                    if (recipeService.recipes.data[i]._id == $stateParams.id) {
+                                        $localStorage.curRecipe = recipeService.recipes.data[i];
+                                        return recipeService.recipes.data[i];
                                     }
                                 }
                             }

@@ -38,7 +38,7 @@
                 console.log(err);
             })
                 .then(function(response) {
-                    console.log(response.data);
+                    console.log(response);
                     rs.recipes.data = response.data;
                 });
         }
