@@ -11,13 +11,13 @@
         // list everything
         var hc = this;
         hc.recipes = recipeService.recipes;
-        hc.displayRecipes = hc.recipes.slice(0,4);
+        hc.displayRecipes = hc.recipes//.slice(0,4);
         hc.getMoreRecipes = getMoreRecipes;
         hc.getRating = getRating;
 
         // define functions
         function getMoreRecipes() {
-            hc.displayRecipes = hc.recipes.slice(0,hc.displayRecipes.length + 4);
+            hc.displayRecipes = hc.recipes//.slice(0,hc.displayRecipes.length + 4);
         }
 
         function getRating(key) {

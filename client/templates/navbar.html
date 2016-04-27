@@ -32,7 +32,7 @@
                         <input type="search" class="form-control" ng-blur="nav.blurit()" ng-focus="nav.showSearch=true"  placeholder="Search Ingredient" ng-model="search.ingredients.ingredient">
                     </div>
                     <ul ng-show="nav.showSearch">
-                        <div ng-repeat="recipe in nav.recipes | filter:search | filter:{private: false}">
+                        <div ng-repeat="recipe in nav.recipes.data | filter:search | filter:{private: false}">
                             <a href="#/{{recipe.$id}}">
                                 <li>
                                     {{recipe.name}}

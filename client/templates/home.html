@@ -7,11 +7,10 @@
         </div>
 
         <br>
-
         <!--image grid http://blackrockdigital.github.io/startbootstrap-thumbnail-gallery/-->
         <!--image from http://www.nyise.org/16Photoblog/Schermerhorn/Cooking/Lets-get-cooking-300x300.png-->
-        <div infinite-scroll="hc.getMoreRecipes()">
-            <div ng-repeat="recipe in hc.displayRecipes | filter:{private: false}">
+        <div> <!--infinite-scroll="hc.getMoreRecipes()">-->
+            <div ng-repeat="recipe in hc.recipes.data"> <!--| filter:{private: false}-->
                 <div class="col-lg-3 col-md-4 col-xs-6 thumb">
                     <a href="#/{{recipe.$id}}">
                         <h4><span ng-bind="recipe.name"></span></h4>
