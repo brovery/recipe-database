@@ -62,7 +62,8 @@
                         controller: "recipeController as rc",
                         resolve: {
                             recipe: function ($stateParams, recipeService, $localStorage) {
-                                console.log(recipeService.recipes.data);
+                                console.log("resolving recipe page", recipeService.recipes);
+                                // TODO: On reload, recipes.data is undefined (asynch?). Fix it!
                                 for (var i = 0; i < recipeService.recipes.data.length; i++) {
                                     if (recipeService.recipes.data[i]._id == $stateParams.id) {
                                         $localStorage.curRecipe = recipeService.recipes.data[i];
@@ -71,8 +72,7 @@
                                 }
                             }
                         }
-                    })
-                    ;
+                    });
 
                 // if none of the above states are matched, use this as the fallback
                 $urlRouterProvider.otherwise("/home");
