@@ -14,7 +14,7 @@
 
         // list everything
         var rs = this;
-        rs.recipes = getRecipes();
+        rs.recipes = {};// = getRecipes();
         rs.users = $firebaseArray(users);
         rs.rateTotal = {rating: 0};
         rs.addRecipe = addRecipe;
@@ -29,6 +29,8 @@
         rs.addToCookBookButton = true;
         var key = "";
 
+        getRecipes();
+
         // define functions
         function getRecipes() { location += "getRecipes";
            console.log('hi');
@@ -36,8 +38,8 @@
                 console.log(err);
             })
                 .then(function(response) {
-                    console.log(response);
-                   return response;
+                    console.log(response.data);
+                    rs.recipes.data = response.data;
                 });
         }
 
