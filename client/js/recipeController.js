@@ -20,10 +20,10 @@
         rc.star = star;
         rc.getRating = getRating;
 
-        console.log($scope);
-
+        console.log(rc.recipe);
 
         if (rc.recipe == undefined) {
+            console.log("hehe");
             rc.recipe = $localStorage.curRecipe;
         }
 

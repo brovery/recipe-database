@@ -33,12 +33,10 @@
 
         // define functions
         function getRecipes() { location += "getRecipes";
-           console.log('hi');
             $http.get(location).catch(function(err){
                 console.log(err);
             })
                 .then(function(response) {
-                    console.log(response.data);
                     rs.recipes.data = response.data;
                 });
         }
