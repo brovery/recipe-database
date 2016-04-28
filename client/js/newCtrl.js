@@ -20,7 +20,6 @@
             this.ingredients = [];
             this.instructions = [];
             this.category = '';
-            this.rating = {};
         };
         var defaultImage = 'img/Lets-get-cooking.png';
         nc.imageShow = defaultImage;
