@@ -42,6 +42,8 @@
             var fireURL = new Firebase(url + "/Recipes/" + id + '/rating');
             var fireRate = $firebaseArray(fireURL);
 
+            var mongoRate = 'http://localhost:3000/api/rate';
+
             for (var i = 1; i <= n; i++) {
                 var starId = '#' + i + 'star';
                 $(starId).html("&#x2605");
