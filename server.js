@@ -108,7 +108,7 @@ app.post('/api/addRecipe', (req, res) => {
 app.post('/api/rate', (req, res) => {
     var newRating = req.body;
     var found = false;
-    
+    console.log(ratings);
     // Check if a rating by that user on that recipe already exists. If so, update it. 
     for (var i = 0; i < ratings.length; i++) {
         if (ratings[i].user_id == newRating.user_id && ratings[i].rec_id == newRating.rec_id) {
@@ -136,7 +136,7 @@ app.post('/api/rate', (req, res) => {
             var collection = db.collection('ratings');
             collection.insertOne(newRating, function(err, r) {
                 assert.equal(err, null);
-                console.log("Inserted 1 rating");
+                console.log("Inserted 1 rating", newRating);
                 res.send("success");
                 db.close();
             });
