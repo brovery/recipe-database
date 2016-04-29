@@ -4,9 +4,11 @@
     angular.module('newCtrl', [])
         .controller('newCtrl', newCtrl);
 
-    newCtrl.$inject = ['Upload', 'recipeService'];
+    newCtrl.$inject = ['Upload', 'recipeService', '$http'];
 
-    function newCtrl(Upload, recipeService) {
+    function newCtrl(Upload, recipeService, $http) {
+
+        var location = 'http://localhost:3000/api/addRecipe';
 
         // list everything
         var nc = this;
@@ -18,7 +20,6 @@
             this.ingredients = [];
             this.instructions = [];
             this.category = '';
-            this.rating = {};
         };
         var defaultImage = 'img/Lets-get-cooking.png';
         nc.imageShow = defaultImage;
@@ -40,11 +41,7 @@
         nc.editName = editName;
 
         function createRecipe() {
-
-            if (nc.imageShow === defaultImage) {
-
-            }
-
+            
             var newRecipe = new Recipe();
             newRecipe.name = nc.name;
             if (nc.imageShow === defaultImage) {
@@ -77,9 +74,9 @@
         }
 
         function addRecipe(recipe) {
-            nc.recipes.$add(recipe).then(function(ref){
-                var recipesId = ref.key();
-                recipeService.addtoCookBook(recipesId);
+            $http.post(location, recipe).then(function(ref){
+                //var recipesId = ref.key();
+                //recipeService.addtoCookBook(recipesId);
             });
         }
 

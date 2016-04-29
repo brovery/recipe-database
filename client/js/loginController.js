@@ -4,12 +4,13 @@
     angular.module('loginController', [])
         .controller('loginController', loginController);
 
-    loginController.$inject = ['$timeout', 'recipeService', '$localStorage'];
+    loginController.$inject = ['$timeout', 'recipeService', '$localStorage', '$http'];
 
-    function loginController($timeout, recipeService, $localStorage) {
+    function loginController($timeout, recipeService, $localStorage, $http) {
 
         // controller data and functions
         var lc = this;
+        var location = 'http://localhost:3000/api/';
         lc.email = "";
         lc.password = "";
         lc.createEmail = "";
@@ -77,20 +78,23 @@
 
 // Generic Login. This will log you in depending upon which link you click.
         function genericLogin(serv) {
-            ref.authWithOAuthPopup(serv, function (error, authData) {
-                if (error) {
-                    console.log('Log in to ' + serv + ' Failed', error);
-                    lc.message = 'Log in to ' + serv + ' Failed ' + error;
-                } else {
-                    console.log('Logged in to ' + serv);
-                    lc.message = 'Logged in to ' + serv;
-                    lc.loginHide = true;
-                    lc.loginHideGoogle = true;
-                    lc.loginData = authData;
-                    brandon(authData);
-                    lc.loginName = "Logout";
-                }
-            });
+            console.log(serv);
+
+
+            // ref.authWithOAuthPopup(serv, function (error, authData) {
+            //     if (error) {
+            //         console.log('Log in to ' + serv + ' Failed', error);
+            //         lc.message = 'Log in to ' + serv + ' Failed ' + error;
+            //     } else {
+            //         console.log('Logged in to ' + serv);
+            //         lc.message = 'Logged in to ' + serv;
+            //         lc.loginHide = true;
+            //         lc.loginHideGoogle = true;
+            //         lc.loginData = authData;
+            //         brandon(authData);
+            //         lc.loginName = "Logout";
+            //     }
+            // });
         }
 
 //logout
@@ -114,28 +118,36 @@
         function nativeLogin() {
             console.log('logging in');
             if (lc.email !== "" || lc.password !== "") {
-
-
-                ref.authWithPassword({
-                    email: lc.email,
-                    password: lc.password
-                }, function (error, authData) {
-                    //console.log(error + authData);
-                    if (error) {
-                        console.log(error);
-                        $('#loginModal').modal('show');
-                        var wrong = "Bad username or Password";
-                    } else {
-                        lc.loginHide = true;
-                        lc.loginHideNative = true;
-                        lc.loginData = authData;
-                        brandon(authData);
-                        lc.loginName = "Logout";
-                    }
-                }, {
-                    //remember: "sessionOnly"
-
+                // call http login service.
+                location += "login";
+                $http.post(location, {username: lc.email, password: lc.password}).then(() => {
+                    console.log('logged in');
+                }).catch(() => {
+                    console.log('login error');
                 });
+                
+                
+
+                // ref.authWithPassword({
+                //     email: lc.email,
+                //     password: lc.password
+                // }, function (error, authData) {
+                //     //console.log(error + authData);
+                //     if (error) {
+                //         console.log(error);
+                //         $('#loginModal').modal('show');
+                //         var wrong = "Bad username or Password";
+                //     } else {
+                //         lc.loginHide = true;
+                //         lc.loginHideNative = true;
+                //         lc.loginData = authData;
+                //         brandon(authData);
+                //         lc.loginName = "Logout";
+                //     }
+                // }, {
+                //     //remember: "sessionOnly"
+                //
+                // });
             }
         }
 

@@ -20,10 +20,10 @@
         rc.star = star;
         rc.getRating = getRating;
 
-        console.log($scope);
-
+        console.log(rc.recipe);
 
         if (rc.recipe == undefined) {
+            console.log("hehe");
             rc.recipe = $localStorage.curRecipe;
         }
 
@@ -41,6 +41,8 @@
             var url = 'https://geo-recipes.firebaseio.com';
             var fireURL = new Firebase(url + "/Recipes/" + id + '/rating');
             var fireRate = $firebaseArray(fireURL);
+
+            var mongoRate = 'http://localhost:3000/api/rate'
 
             for (var i = 1; i <= n; i++) {
                 var starId = '#' + i + 'star';
