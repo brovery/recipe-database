@@ -61,19 +61,19 @@
         }
 
         function brandon(authData) {
-            console.log(authData);
+            // console.log(authData);
 
             if (authData.provider == "password") {
-                recipeService.loggedin.username = authData.password.email;
+                recipeService.loggedin.username = authData.displayName;
                 $("#loginDef").css("display", "block");
             } else {
                 recipeService.loggedin.username = authData[authData.provider].displayName;
                 lc.loginImage = authData[authData.provider].profileImageURL;
                 $("#loginImage").css("display", "block");
             }
-            recipeService.loggedin.user = authData.uid;
+            recipeService.loggedin.user = authData._id;
             recipeService.loggedin.loggedin = true;
-            recipeService.login();
+            // recipeService.login();
         }
 
 // Generic Login. This will log you in depending upon which link you click.
@@ -119,11 +119,16 @@
             console.log('logging in');
             if (lc.email !== "" || lc.password !== "") {
                 // call http login service.
-                location += "login";
-                $http.post(location, {username: lc.email, password: lc.password}).then(() => {
-                    console.log('logged in');
-                }).catch(() => {
-                    console.log('login error');
+                var loginLoc = location + "login";
+                $http.post(loginLoc, {username: lc.email, password: lc.password}).then((res) => {
+                    lc.loginHide = true;
+                    lc.loginHideNative = true;
+                    lc.loginData = res.data;
+                    res.data.provider = "password";
+                    brandon(res.data);
+                    lc.loginName = "Logout";
+                }).catch((err) => {
+                    console.log('login error:', err);
                 });
                 
                 

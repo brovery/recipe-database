@@ -142,6 +142,7 @@ app.post('/api/rate', (req, res) => {
             });
         });
     }
+    updateData();
 });
 
 app.post('/api/addBook', (req, res) => {
@@ -159,6 +160,7 @@ app.post('/api/addBook', (req, res) => {
             db.close();
         });
     });
+    updateData();
 });
 
 app.post('/api/removeBook', (req, res) => {
@@ -176,13 +178,13 @@ app.post('/api/removeBook', (req, res) => {
             db.close();
         });
     });
+    updateData();
 });
 
 app.post('/api/login', function(req, res, next) {
-    console.log(req.body);
     passport.authenticate('local', function(err, user, info) {
         console.log("error?", err, user, info);
-        res.send('end');
+        res.send(user);
     })(req, res, next);
 });
 
@@ -191,21 +193,21 @@ app.listen(3000, function() {
 });
 
 passport.use(new LocalStrategy(function(username, password, done) {
-    console.log("user/pass", username, password);
-    User.findOne({ username: username }, function(err, user) {
-        console.log("What in blazes is going on?", err, user);
-        if (err) {
-            console.log("error!", err);
-            return done(err);
+    for (var i = 0; i < users.length; i++) {
+        if (users[i].username === username) {
+            console.log("found username");
+            if (users[i].password === password) {
+                console.log("password matches");
+                return done(null, users[i]);
+            } else {
+                console.log("incorrect password");
+                return done(null, false, {message: 'Incorrect password.'});
+            }
         }
-        if (!user) {
-            return done(null, false, { message: 'Incorrect username.' });
-        }
-        if (!user.validPassword(password)) {
-            return done(null, false, { message: 'Incorrect password.' });
-        }
-        return done(null, user);
-    });
+    }
+
+    return done(null, false, { message: 'Incorrect username.' });
+
 }));
 
 // This function will create a basic database structure for testing purposes.
