@@ -62,7 +62,7 @@
                         controller: "recipeController as rc",
                         resolve: {
                             recipe: function ($stateParams, recipeService, $localStorage) {
-                                console.log("resolving recipe page", recipeService.recipes);
+                                console.log("recipeService id", recipeService.recipes);
                                 // TODO: On reload, recipes.data is undefined (asynch?). Fix it!
                                 for (var i = 0; i < recipeService.recipes.data.length; i++) {
                                     if (recipeService.recipes.data[i]._id == $stateParams.id) {

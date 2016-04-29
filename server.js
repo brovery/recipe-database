@@ -4,11 +4,14 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 var url = 'mongodb://localhost:27017/recipes';
 
 // The setupDatabase function call will set up a basic database structure with test data. Uncomment it if you want the basic structure set up.
 // setupDatabase();
+// setupUser();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -16,30 +19,39 @@ app.use(bodyParser.json());
 app.use('/', express.static(__dirname + '/client'));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
 
-var recipes, ratings, cookbook;
+var recipes, ratings, cookbook, users;
 
-MongoClient.connect(url, function(err, db) {
-    assert.equal(null, err);
-    console.log("Connected correctly to database");
-    
-    var collection = db.collection('recipes');
-    var collection2 = db.collection('ratings');
-    var collection3 = db.collection('cookbook');
-    
-    collection.find({}).toArray(function(err, docs) {
-        assert.equal(err, null);
-        recipes = docs;
-        collection2.find({}).toArray(function(err, docs2) {
+updateData();
+
+function updateData() {
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+        console.log("Connected correctly to database");
+
+        var collection = db.collection('recipes');
+        var collection2 = db.collection('ratings');
+        var collection3 = db.collection('cookbook');
+        var collection4 = db.collection('users');
+
+        collection.find({}).toArray(function(err, docs) {
             assert.equal(err, null);
-            ratings = docs2;
-            collection3.find({}).toArray(function(err, docs3) {
+            recipes = docs;
+            collection2.find({}).toArray(function(err, docs2) {
                 assert.equal(err, null);
-                cookbook = docs3;
-                db.close();
+                ratings = docs2;
+                collection3.find({}).toArray(function(err, docs3) {
+                    assert.equal(err, null);
+                    cookbook = docs3;
+                    collection4.find({}).toArray(function(err, docs4) {
+                        assert.equal(err, null);
+                        users = docs4;
+                        db.close();
+                    });
+                });
             });
         });
     });
-});
+}
 
 app.get('/api/getRecipes', (req, res) => {
     var count = 0; 
@@ -90,6 +102,7 @@ app.post('/api/addRecipe', (req, res) => {
             db.close();
         });
     });
+    updateData();
 });
 
 app.post('/api/rate', (req, res) => {
@@ -165,9 +178,35 @@ app.post('/api/removeBook', (req, res) => {
     });
 });
 
+app.post('/api/login', function(req, res, next) {
+    console.log(req.body);
+    passport.authenticate('local', function(err, user, info) {
+        console.log("error?", err, user, info);
+        res.send('end');
+    })(req, res, next);
+});
+
 app.listen(3000, function() {
     console.log('App listening on port 3000');
 });
+
+passport.use(new LocalStrategy(function(username, password, done) {
+    console.log("user/pass", username, password);
+    User.findOne({ username: username }, function(err, user) {
+        console.log("What in blazes is going on?", err, user);
+        if (err) {
+            console.log("error!", err);
+            return done(err);
+        }
+        if (!user) {
+            return done(null, false, { message: 'Incorrect username.' });
+        }
+        if (!user.validPassword(password)) {
+            return done(null, false, { message: 'Incorrect password.' });
+        }
+        return done(null, user);
+    });
+}));
 
 // This function will create a basic database structure for testing purposes.
 function setupDatabase() {
@@ -208,6 +247,27 @@ function setupDatabase() {
                 assert.equal(err, null);
                 db.close();
             });
+        });
+    });
+}
+
+// set up basic user in database.
+
+function setupUser() {
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+
+        var newUser = {
+            username: 'a@a.a',
+            password: 'a',
+            displayName: 'a',
+            emails: [{ value: 'a@a.a' }]
+        };
+
+        var collection = db.collection('users');
+
+        collection.insertOne(newUser, function(err, docs) {
+            assert.equal(err, null);
         });
     });
 }
