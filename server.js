@@ -21,33 +21,37 @@ app.use('/node_modules', express.static(__dirname + '/node_modules'));
 
 var recipes, ratings, cookbook, users;
 
-MongoClient.connect(url, function(err, db) {
-    assert.equal(null, err);
-    console.log("Connected correctly to database");
-    
-    var collection = db.collection('recipes');
-    var collection2 = db.collection('ratings');
-    var collection3 = db.collection('cookbook');
-    var collection4 = db.collection('users');
-    
-    collection.find({}).toArray(function(err, docs) {
-        assert.equal(err, null);
-        recipes = docs;
-        collection2.find({}).toArray(function(err, docs2) {
+updateData();
+
+function updateData() {
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+        console.log("Connected correctly to database");
+
+        var collection = db.collection('recipes');
+        var collection2 = db.collection('ratings');
+        var collection3 = db.collection('cookbook');
+        var collection4 = db.collection('users');
+
+        collection.find({}).toArray(function(err, docs) {
             assert.equal(err, null);
-            ratings = docs2;
-            collection3.find({}).toArray(function(err, docs3) {
+            recipes = docs;
+            collection2.find({}).toArray(function(err, docs2) {
                 assert.equal(err, null);
-                cookbook = docs3;
-                collection4.find({}).toArray(function(err, docs4) {
+                ratings = docs2;
+                collection3.find({}).toArray(function(err, docs3) {
                     assert.equal(err, null);
-                    users = docs4;
-                    db.close();
+                    cookbook = docs3;
+                    collection4.find({}).toArray(function(err, docs4) {
+                        assert.equal(err, null);
+                        users = docs4;
+                        db.close();
+                    });
                 });
             });
         });
     });
-});
+}
 
 app.get('/api/getRecipes', (req, res) => {
     var count = 0; 
@@ -98,6 +102,7 @@ app.post('/api/addRecipe', (req, res) => {
             db.close();
         });
     });
+    updateData();
 });
 
 app.post('/api/rate', (req, res) => {

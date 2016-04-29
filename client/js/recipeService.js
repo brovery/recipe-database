@@ -38,7 +38,9 @@
             })
                 .then(function(response) {
                     rs.recipes.data = response.data;
+                    console.log(rs.recipes);
                 });
+
         }
 
         function addRecipe(recipe) {

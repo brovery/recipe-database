@@ -54,7 +54,6 @@
             newRecipe.category = nc.category;
             newRecipe.private = nc.privacy;
             newRecipe.userName = nc.userName;
-            newRecipe.rating = {placeholder: 0};
             for (var i = 0; i < nc.ingredients.length; i++) {
                 newRecipe.ingredients.push({ingredient: nc.ingredients[i].name, qty: nc.ingredients[i].qty});
             }
@@ -78,6 +77,9 @@
                 //var recipesId = ref.key();
                 //recipeService.addtoCookBook(recipesId);
             });
+            recipeService.recipes.data.push(recipe);
+            
+            console.log(recipeService.recipes);
         }
 
         function addPost(files) {
