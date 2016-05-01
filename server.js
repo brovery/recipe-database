@@ -6,6 +6,7 @@ var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var url = 'mongodb://localhost:27017/recipes';
 
@@ -54,7 +55,7 @@ function updateData() {
 }
 
 app.get('/api/getRecipes', (req, res) => {
-    var count = 0; 
+    var count = 0;
     var sum = 0;
 
     // console.log('getting recipes');
@@ -126,7 +127,7 @@ app.post('/api/rate', (req, res) => {
 
 app.post('/api/addBook', (req, res) => {
     var cookbook = req.body;
-    
+
     MongoClient.connect(url, function(err, db) {
         assert.equal(err, null);
 
@@ -160,16 +161,31 @@ app.post('/api/removeBook', (req, res) => {
 });
 
 app.post('/api/login', function(req, res, next) {
-    passport.authenticate('local', function(err, user, info) {
-        console.log("error?", err, user, info);
-        res.send(user);
-    })(req, res, next);
+
+    if (req.body.service == 'password') {
+        passport.authenticate('local', function(err, user, info) {
+            // TODO: Should add error handling here.
+            res.send(user);
+        })(req, res, next);
+    } else {
+        console.log(req.body.service);
+        passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] });
+    }
 });
+
+app.get('/api/google', passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }));
+
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }),
+    function(req, res) {
+        res.redirect('/');
+    }
+);
 
 app.listen(3000, function() {
     console.log('App listening on port 3000');
 });
 
+// Localstrategy passport auth
 passport.use(new LocalStrategy(function(username, password, done) {
     for (var i = 0; i < users.length; i++) {
         if (users[i].username === username) {
@@ -183,10 +199,23 @@ passport.use(new LocalStrategy(function(username, password, done) {
             }
         }
     }
-
     return done(null, false, { message: 'Incorrect username.' });
-
 }));
+
+// Google passport auth
+passport.use(new GoogleStrategy({
+        clientID: "539529748048-ue2jododsf3d4m6gtticj6k5lbapfho0.apps.googleusercontent.com",
+        clientSecret: "BFSm5Hr0SMnfRP0z7Mzrv5b0",
+        callbackURL: "http://localhost:3000/auth/google/callback"
+    },
+    function(accessToken, refreshToken, profile, done) {
+        console.log("google auth");
+        done(null, profile);
+        // User.findOrCreate({ googleId: profile.id }, function (err, user) {
+        //     return done(err, user);
+        // });
+    }
+));
 
 // This function will create a basic database structure for testing purposes.
 function setupDatabase() {
