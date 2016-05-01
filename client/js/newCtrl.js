@@ -13,6 +13,7 @@
         // list everything
         var nc = this;
         nc.recipes = recipeService.recipes;
+
         var Recipe = function () {
             this.name = "";
             this.prepTime = "";
@@ -21,6 +22,7 @@
             this.instructions = [];
             this.category = '';
         };
+
         var defaultImage = 'img/Lets-get-cooking.png';
         nc.imageShow = defaultImage;
         nc.name = '';
