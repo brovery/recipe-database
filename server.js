@@ -97,8 +97,7 @@ app.post('/api/addRecipe', (req, res) => {
 
         collection.insertOne(newRecipe, function(err, r) {
             assert.equal(err, null);
-            console.log("inserted 1 recipe");
-            res.send("success");
+            res.send(r.ops);
             db.close();
         });
     });
@@ -106,7 +105,6 @@ app.post('/api/addRecipe', (req, res) => {
 });
 
 app.post('/api/rate', (req, res) => {
-    console.log("Rating");
     var newRating = req.body;
 
     MongoClient.connect(url, function(err, db) {
@@ -119,7 +117,6 @@ app.post('/api/rate', (req, res) => {
             {upsert: true}, // This value will insert a new record if no matching record is found.
             function(err, r) {
             assert.equal(err, null);
-            console.log("Updated 1 rating");
             res.send(r);
             db.close();
         });
@@ -137,7 +134,6 @@ app.post('/api/addBook', (req, res) => {
 
         collection.insertOne(cookbook, function(err, r) {
             assert.equal(err, null);
-            console.log("inserted 1 recipe");
             res.send("success");
             db.close();
         });

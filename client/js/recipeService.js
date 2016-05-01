@@ -27,19 +27,22 @@
         rs.userindex = -1;
         rs.curRecipe = $localStorage['curRecipe'];
         rs.addToCookBookButton = true;
+        rs.getRecipes = getRecipes;
         var key = "";
 
         getRecipes();
 
         // define functions
-        function getRecipes() { location += "getRecipes";
-            $http.get(location).catch(function(err){
+        function getRecipes() {
+            console.log("Loading Recipes!");
+            var apiLocation = location + "getRecipes";
+            $http.get(apiLocation).catch(function(err){
                 console.log(err);
-            })
-                .then(function(response) {
-                    rs.recipes.data = response.data;
-                    console.log(rs.recipes);
-                });
+            }).then(function(response) {
+                rs.recipes.data = response.data;
+                console.log(rs.recipes);
+                console.log(response.data);
+            });
 
         }
 
