@@ -1,4 +1,4 @@
-<div class="alert alert-info row" ng-init="rc.getRating(rc.recipe.$id)">
+<div class="alert alert-info row" ng-init="rc.getRating(rc.recipe._id)">
     <div class="row">
         <h2 ng-bind="rc.recipe.name" class="recipeTitle"></h2>
     </div>
@@ -57,7 +57,7 @@
             <button class="btn btn-primary" ng-click="rc.editRecipe()">Edit this Recipe</button>
         </a>
         <button ng-show="rc.loggedin.loggedin" ng-hide="rc.addToCookBookButton" class="btn btn-primary add-button"
-                ng-click="rc.addtoCookBook(rc.recipe.$id)">Add to
+                ng-click="rc.addtoCookBook(rc.recipe._id)">Add to
             Cookbook
         </button>
     </div>

@@ -97,8 +97,7 @@ app.post('/api/addRecipe', (req, res) => {
 
         collection.insertOne(newRecipe, function(err, r) {
             assert.equal(err, null);
-            console.log("inserted 1 recipe");
-            res.send("success");
+            res.send(r.ops);
             db.close();
         });
     });
@@ -107,41 +106,21 @@ app.post('/api/addRecipe', (req, res) => {
 
 app.post('/api/rate', (req, res) => {
     var newRating = req.body;
-    var found = false;
-    console.log(ratings);
-    // Check if a rating by that user on that recipe already exists. If so, update it. 
-    for (var i = 0; i < ratings.length; i++) {
-        if (ratings[i].user_id == newRating.user_id && ratings[i].rec_id == newRating.rec_id) {
-            found = true;
-            var id = ratings[i]._id;
-            MongoClient.connect(url, function(err, db) {
-                assert.equal(err, null);
 
-                var collection = db.collection('ratings');
-                collection.updateOne({_id: id}, {rating: newRating.rating}, function(err, r) {
-                    assert.equal(err, null);
-                    console.log("Updated 1 rating");
-                    res.send("success");
-                    db.close();
-                });
-            });
-        }
-    }
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(err, null);
 
-    // If a rating by that user doesn't already exist, create a new one!
-    if (found == false) {
-        MongoClient.connect(url, function(err, db) {
+        var collection = db.collection('ratings');
+        collection.updateOne(
+            {user_id: newRating.user_id, rec_id: newRating.rec_id},
+            newRating,
+            {upsert: true}, // This value will insert a new record if no matching record is found.
+            function(err, r) {
             assert.equal(err, null);
-
-            var collection = db.collection('ratings');
-            collection.insertOne(newRating, function(err, r) {
-                assert.equal(err, null);
-                console.log("Inserted 1 rating", newRating);
-                res.send("success");
-                db.close();
-            });
+            res.send(r);
+            db.close();
         });
-    }
+    });
     updateData();
 });
 
@@ -155,7 +134,6 @@ app.post('/api/addBook', (req, res) => {
 
         collection.insertOne(cookbook, function(err, r) {
             assert.equal(err, null);
-            console.log("inserted 1 recipe");
             res.send("success");
             db.close();
         });
@@ -231,7 +209,7 @@ function setupDatabase() {
         };
 
         var newRating = {
-            userId: 1,
+            user_id: 1,
             rec_id: "1",
             rating: 5
         };

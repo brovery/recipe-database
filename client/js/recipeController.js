@@ -4,7 +4,7 @@
     angular.module('recipeController', [])
         .controller('recipeController', recipeController);
 
-    recipeController.$inject = ['$http','recipeService', 'recipe', '$firebaseArray', '$localStorage', '$interval', '$scope'];
+    recipeController.$inject = ['$http', 'recipeService', 'recipe', '$firebaseArray', '$localStorage', '$interval', '$scope'];
 
     function recipeController($http, recipeService, recipe, $firebaseArray, $localStorage, $interval, $scope) {
         // list everything
@@ -46,19 +46,18 @@
                 $(starId).css("color", "yellow");
             }
 
-            console.log(id);
-
-            var user = recipeService.loggedin.user;
             var newRate = {
-                user_id: user,
+                user_id: recipeService.loggedin.user,
                 rating: n,
                 rec_id: id
             };
 
+            console.log(newRate);
+
             $http.post(mongoRate, newRate).then(function (data) {
                 console.log(data);
             });
-
+            
             getRating(id);
 
         }
