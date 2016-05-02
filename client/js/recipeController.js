@@ -19,6 +19,7 @@
         rc.editRecipe = editRecipe;
         rc.star = star;
         rc.getRating = getRating;
+        rc.temp = temp;
 
         console.log(rc.recipe);
 
@@ -28,6 +29,11 @@
         }
 
         // define functions
+        function temp() {
+            console.log(rc.loggedin.loggedin);
+            console.log(rc.addToCookBookButton);
+        }
+        
         function initRecipe() {
             recipeService.initRecipe();
         }

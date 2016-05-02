@@ -17,8 +17,6 @@
             "app.filters",
             "editrecipeController",
             "infinite-scroll"
-
-
         ])
 
         .config(["$stateProvider", "$urlRouterProvider", "$localStorageProvider",
