@@ -103,8 +103,15 @@
         function genericLogin(serv) {
             console.log(serv);
 
-            $http.get(location + 'google', function(res) {
-                console.log(res);
+            $http.get('http://localhost:3000/api/google')
+                .then(function(res) {
+                    console.log("response:", res);
+                    lc.message = 'Logged in to ' + serv;
+                    lc.loginHide = true;
+                    lc.loginHideGoogle = true;
+                    // lc.$storage.loginData = res;
+                }).catch(function(err) {
+                    console.error(err);
             });
 
 
