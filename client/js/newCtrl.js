@@ -13,6 +13,7 @@
         // list everything
         var nc = this;
         nc.recipes = recipeService.recipes;
+
         var Recipe = function () {
             this.name = "";
             this.prepTime = "";
@@ -21,6 +22,7 @@
             this.instructions = [];
             this.category = '';
         };
+
         var defaultImage = 'img/Lets-get-cooking.png';
         nc.imageShow = defaultImage;
         nc.name = '';
@@ -74,12 +76,11 @@
 
         function addRecipe(recipe) {
             $http.post(location, recipe).then(function(ref){
-                //var recipesId = ref.key();
-                //recipeService.addtoCookBook(recipesId);
+                // ref.data[0] is the object added to the database. This pushes the same object into the recipes array.
+                recipeService.recipes.data.push(ref.data[0]); 
+                var recipesId = ref.data[0]._id;
+                recipeService.addtoCookBook(recipesId);
             });
-            recipeService.recipes.data.push(recipe);
-            
-            console.log(recipeService.recipes);
         }
 
         function addPost(files) {

@@ -4,9 +4,9 @@
     angular.module('recipeController', [])
         .controller('recipeController', recipeController);
 
-    recipeController.$inject = ['recipeService', 'recipe', '$firebaseArray', '$localStorage', '$interval', '$scope'];
+    recipeController.$inject = ['$http', 'recipeService', 'recipe', '$firebaseArray', '$localStorage', '$interval', '$scope'];
 
-    function recipeController(recipeService, recipe, $firebaseArray, $localStorage, $interval, $scope) {
+    function recipeController($http, recipeService, recipe, $firebaseArray, $localStorage, $interval, $scope) {
         // list everything
         var rc = this;
         var num = 0;
@@ -19,6 +19,7 @@
         rc.editRecipe = editRecipe;
         rc.star = star;
         rc.getRating = getRating;
+        rc.temp = temp;
 
         console.log(rc.recipe);
 
@@ -28,6 +29,11 @@
         }
 
         // define functions
+        function temp() {
+            console.log(rc.loggedin.loggedin);
+            console.log(rc.addToCookBookButton);
+        }
+        
         function initRecipe() {
             recipeService.initRecipe();
         }
@@ -38,10 +44,6 @@
         }
 
         function star(id, n) {
-            var url = 'https://geo-recipes.firebaseio.com';
-            var fireURL = new Firebase(url + "/Recipes/" + id + '/rating');
-            var fireRate = $firebaseArray(fireURL);
-
             var mongoRate = 'http://localhost:3000/api/rate';
 
             for (var i = 1; i <= n; i++) {
@@ -50,19 +52,18 @@
                 $(starId).css("color", "yellow");
             }
 
-            var user = recipeService.loggedin.user;
             var newRate = {
-                user: user,
-                rating: n
+                user_id: recipeService.loggedin.user,
+                rating: n,
+                rec_id: id
             };
-            fireRate.$loaded(function () {
-                for (i = 0; i < fireRate.length; i++) {
-                    if (user === fireRate[i].user) {
-                        fireRate.$remove(fireRate[i]);
-                    }
-                }
-                fireRate.$add(newRate);
+
+            console.log(newRate);
+
+            $http.post(mongoRate, newRate).then(function (data) {
+                console.log(data);
             });
+            
             getRating(id);
 
         }

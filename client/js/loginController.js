@@ -33,52 +33,86 @@
         lc.recipes = recipeService.recipes;
         lc.users = recipeService.users;
         lc.loginImage = "";
-        lc.loginData = $localStorage['firebase:session::geo-recipes'];
-        lc.message = lc.loginData ? "Logged in to " + lc.loginData.provider : "No login data found.";
+        lc.$storage = $localStorage;
+        lc.message = lc.$storage.loginData ? "Logged in to " + lc.$storage.loginData.provider : "No login data found.";
 
         // IMPORTANT: change to match the URL of your Firebase.
-        var url = 'https://geo-recipes.firebaseio.com/';
-        var ref = new Firebase(url);
+        // var url = 'https://geo-recipes.firebaseio.com/';
+        // var ref = new Firebase(url);
 
-        if (lc.loginData) {
-            if (lc.loginData.provider == "password") {
-                recipeService.loggedin.username = lc.loginData[lc.loginData.provider].email;
-                $("#loginDef").css("display", "block");
+        // This code will check for a user in localstorage, and use that if it exists.
+        if (lc.$storage.loginData) {
+            if (lc.$storage.loginData.provider == "password") {
+                console.log("Pulling login data from localstorage");
+                console.log(lc.$storage.loginData);
+                recipeService.loggedin.username = lc.$storage.loginData.displayName;
+
                 lc.loginHideNative = true;
+                // $("#loginDef").css("display", "block");
             } else {
-                recipeService.loggedin.username = lc.loginData[lc.loginData.provider].displayName;
-                lc.loginImage = lc.loginData[lc.loginData.provider].profileImageURL;
+                recipeService.loggedin.username = lc.$storage.loginData[lc.$storage.loginData.provider].displayName;
+                lc.loginImage = lc.$storage.loginData[lc.$storage.loginData.provider].profileImageURL;
                 $("#loginImage").css("display", "block");
                 lc.loginHideGoogle = true;
             }
             lc.loginHide = true;
             lc.loginName = "Logout";
-            recipeService.loggedin.user = lc.loginData.uid;
+            recipeService.loggedin.user = lc.$storage.loginData._id;
             recipeService.loggedin.loggedin = true;
             console.log(recipeService.loggedin);
 
             recipeService.login();
         }
 
+        // This function sets up some data & dom objects.
         function brandon(authData) {
-            console.log(authData);
-
             if (authData.provider == "password") {
-                recipeService.loggedin.username = authData.password.email;
+                recipeService.loggedin.username = authData.displayName;
                 $("#loginDef").css("display", "block");
             } else {
                 recipeService.loggedin.username = authData[authData.provider].displayName;
                 lc.loginImage = authData[authData.provider].profileImageURL;
                 $("#loginImage").css("display", "block");
             }
-            recipeService.loggedin.user = authData.uid;
+            recipeService.loggedin.user = authData._id;
             recipeService.loggedin.loggedin = true;
-            recipeService.login();
+            // recipeService.login();
+        }
+
+//Native login
+        function nativeLogin() {
+            console.log('logging in');
+            if (lc.email !== "" || lc.password !== "") {
+                // call http login service.
+                var loginLoc = location + "login";
+                $http.post(loginLoc, {service: 'password', username: lc.email, password: lc.password}).then((res) => {
+                    lc.loginHide = true;
+                    lc.loginHideNative = true;
+                    res.data.provider = "password";
+                    res.data.password = "";
+                    lc.$storage.loginData = res.data;
+                    brandon(res.data);
+                    lc.loginName = "Logout";
+                }).catch((err) => {
+                    console.log('login error:', err);
+                });
+            }
         }
 
 // Generic Login. This will log you in depending upon which link you click.
         function genericLogin(serv) {
             console.log(serv);
+
+            $http.get('http://localhost:3000/api/google')
+                .then(function(res) {
+                    console.log("response:", res);
+                    lc.message = 'Logged in to ' + serv;
+                    lc.loginHide = true;
+                    lc.loginHideGoogle = true;
+                    // lc.$storage.loginData = res;
+                }).catch(function(err) {
+                    console.error(err);
+            });
 
 
             // ref.authWithOAuthPopup(serv, function (error, authData) {
@@ -90,7 +124,7 @@
             //         lc.message = 'Logged in to ' + serv;
             //         lc.loginHide = true;
             //         lc.loginHideGoogle = true;
-            //         lc.loginData = authData;
+            //         lc.$storage.loginData = authData;
             //         brandon(authData);
             //         lc.loginName = "Logout";
             //     }
@@ -101,9 +135,9 @@
         // this removes google data from local storage
         // to FULLY logout, you MUST go to google.com and logout
         function deleteData() {
-            ref.unauth();
+            // ref.unauth();
             $localStorage.$reset();
-            lc.loginData = {};
+            // lc.$storage.loginData = {};
             lc.message = 'google data deleted.';
             recipeService.loggedin.user = "";
             recipeService.loggedin.username = "";
@@ -112,43 +146,6 @@
             lc.loginHideGoogle = false;
             $("#loginDef").css("display", "none");
             lc.loginHideNative = true;
-        }
-
-//Native login
-        function nativeLogin() {
-            console.log('logging in');
-            if (lc.email !== "" || lc.password !== "") {
-                // call http login service.
-                location += "login";
-                $http.post(location, {username: lc.email, password: lc.password}).then(() => {
-                    console.log('logged in');
-                }).catch(() => {
-                    console.log('login error');
-                });
-                
-                
-
-                // ref.authWithPassword({
-                //     email: lc.email,
-                //     password: lc.password
-                // }, function (error, authData) {
-                //     //console.log(error + authData);
-                //     if (error) {
-                //         console.log(error);
-                //         $('#loginModal').modal('show');
-                //         var wrong = "Bad username or Password";
-                //     } else {
-                //         lc.loginHide = true;
-                //         lc.loginHideNative = true;
-                //         lc.loginData = authData;
-                //         brandon(authData);
-                //         lc.loginName = "Logout";
-                //     }
-                // }, {
-                //     //remember: "sessionOnly"
-                //
-                // });
-            }
         }
 
 //Create native user - https://www.firebase.com/docs/web/guide/login/password.html
