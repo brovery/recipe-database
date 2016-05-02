@@ -8,6 +8,8 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
+var expressSession = require('express-session');
+var cookieParser = require('cookie-parser');
 
 var url = 'mongodb://localhost:27017/recipes';
 
@@ -15,20 +17,24 @@ var url = 'mongodb://localhost:27017/recipes';
 // setupDatabase();
 // setupUser();
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(expressSession({secret: 'awesomeness', resave: true, saveUninitialized: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 app.use('/', express.static(__dirname + '/client'));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
 
-passport.serializeUser(function(user, done) {
-    console.log("serialize", user);
+passport.serializeUser(function (user, done) {
+    console.log("serialize");
     done(null, user);
 });
 
-passport.deserializeUser(function(obj, done) {
+passport.deserializeUser(function (obj, done) {
     console.log("deserialize", obj);
     done(null, obj);
 });
@@ -174,34 +180,33 @@ app.post('/api/removeBook', (req, res) => {
 });
 
 app.post('/api/login', function (req, res, next) {
-
-    if (req.body.service == 'password') {
-        passport.authenticate('local', function (err, user, info) {
-            // TODO: Should add error handling here.
-            res.send(user);
-        })(req, res, next);
-    } else {
-        console.log(req.body.service);
-        passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']});
-    }
+    passport.authenticate('local', function (err, user, info) {
+        // TODO: Should add error handling here.
+        res.send(user);
+    })(req, res, next);
 });
 
-app.get('/api/google', passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
+app.get('/api/google', passport.authenticate('google', {scope: ['profile']}));
 
 app.get('/auth/google/callback', passport.authenticate('google', {failureRedirect: '/login'}),
     function (req, res) {
+        console.log("callback");
         res.redirect('/');
     }
 );
 
-app.get('/api/facebook', passport.authenticate('facebook'), function(req, res) {
+app.get('api/getUser', function (req, res) {
+    res.send(req.user);
+});
+
+app.get('/api/facebook', passport.authenticate('facebook'), function (req, res) {
     console.log("/api/facebook", res);
 });
 
 app.get('/auth/facebook/callback', passport.authenticate('facebook'),
     function (req, res) {
         console.log("Inside callback");
-        res.redirect('/');
+        res.redirect('/#/home');
     }
 );
 
