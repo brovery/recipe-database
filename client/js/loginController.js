@@ -102,17 +102,18 @@
 // Generic Login. This will log you in depending upon which link you click.
         function genericLogin(serv) {
             console.log(serv);
+            // location.href="http://localhost:3000/api/google";
 
-            $http.get('http://localhost:3000/api/google')
-                .then(function(res) {
-                    console.log("response:", res);
-                    lc.message = 'Logged in to ' + serv;
-                    lc.loginHide = true;
-                    lc.loginHideGoogle = true;
-                    // lc.$storage.loginData = res;
-                }).catch(function(err) {
-                    console.error(err);
-            });
+            // $http.get('http://localhost:3000/api/google')
+            //     .then(function(res) {
+            //         console.log("response:", res);
+            //         lc.message = 'Logged in to ' + serv;
+            //         lc.loginHide = true;
+            //         lc.loginHideGoogle = true;
+            //         // lc.$storage.loginData = res;
+            //     }).catch(function(err) {
+            //         console.error(err);
+            // });
 
 
             // ref.authWithOAuthPopup(serv, function (error, authData) {
