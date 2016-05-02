@@ -201,7 +201,7 @@ app.get('/api/facebook', passport.authenticate('facebook'), function(req, res) {
 app.get('/auth/facebook/callback', passport.authenticate('facebook'),
     function (req, res) {
         console.log("Inside callback");
-        res.redirect('/');
+        res.redirect('/#/home');
     }
 );
 
