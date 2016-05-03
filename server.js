@@ -6,6 +6,10 @@ var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
+var expressSession = require('express-session');
+var cookieParser = require('cookie-parser');
 
 var url = 'mongodb://localhost:27017/recipes';
 
@@ -13,18 +17,45 @@ var url = 'mongodb://localhost:27017/recipes';
 // setupDatabase();
 // setupUser();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(expressSession({secret: 'awesomeness', resave: true, saveUninitialized: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 app.use('/', express.static(__dirname + '/client'));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
+
+passport.serializeUser(function (user, done) {
+    console.log("serialize");
+    done(null, user);
+});
+
+passport.deserializeUser(function (obj, done) {
+    //console.log("deserialize");
+    var newUser = { _id: obj.id, displayName: obj.displayName, provider: obj.provider };
+
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(err, null);
+        var collection = db.collection('users');
+        collection.updateOne({_id: obj.id}, newUser, { upsert: true }, function(err, r) {
+            assert.equal(err, null);
+            db.close();
+        })
+    });
+
+    done(null, obj);
+});
 
 var recipes, ratings, cookbook, users;
 
 updateData();
 
 function updateData() {
-    MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function (err, db) {
         assert.equal(null, err);
         console.log("Connected correctly to database");
 
@@ -33,16 +64,16 @@ function updateData() {
         var collection3 = db.collection('cookbook');
         var collection4 = db.collection('users');
 
-        collection.find({}).toArray(function(err, docs) {
+        collection.find({}).toArray(function (err, docs) {
             assert.equal(err, null);
             recipes = docs;
-            collection2.find({}).toArray(function(err, docs2) {
+            collection2.find({}).toArray(function (err, docs2) {
                 assert.equal(err, null);
                 ratings = docs2;
-                collection3.find({}).toArray(function(err, docs3) {
+                collection3.find({}).toArray(function (err, docs3) {
                     assert.equal(err, null);
                     cookbook = docs3;
-                    collection4.find({}).toArray(function(err, docs4) {
+                    collection4.find({}).toArray(function (err, docs4) {
                         assert.equal(err, null);
                         users = docs4;
                         db.close();
@@ -54,7 +85,7 @@ function updateData() {
 }
 
 app.get('/api/getRecipes', (req, res) => {
-    var count = 0; 
+    var count = 0;
     var sum = 0;
 
     // console.log('getting recipes');
@@ -90,15 +121,14 @@ app.post('/api/addRecipe', (req, res) => {
     var newRecipe = req.body;
     // Will need to add some error-checking to this to confirm that the recipe is set up correctly.
 
-    MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function (err, db) {
         assert.equal(err, null);
 
         var collection = db.collection('recipes');
 
-        collection.insertOne(newRecipe, function(err, r) {
+        collection.insertOne(newRecipe, function (err, r) {
             assert.equal(err, null);
-            console.log("inserted 1 recipe");
-            res.send("success");
+            res.send(r.ops);
             db.close();
         });
     });
@@ -107,110 +137,143 @@ app.post('/api/addRecipe', (req, res) => {
 
 app.post('/api/rate', (req, res) => {
     var newRating = req.body;
-    var found = false;
-    console.log(ratings);
-    // Check if a rating by that user on that recipe already exists. If so, update it. 
-    for (var i = 0; i < ratings.length; i++) {
-        if (ratings[i].user_id == newRating.user_id && ratings[i].rec_id == newRating.rec_id) {
-            found = true;
-            var id = ratings[i]._id;
-            MongoClient.connect(url, function(err, db) {
+
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(err, null);
+
+        var collection = db.collection('ratings');
+        collection.updateOne(
+            {user_id: newRating.user_id, rec_id: newRating.rec_id},
+            newRating,
+            {upsert: true}, // This value will insert a new record if no matching record is found.
+            function (err, r) {
                 assert.equal(err, null);
-
-                var collection = db.collection('ratings');
-                collection.updateOne({_id: id}, {rating: newRating.rating}, function(err, r) {
-                    assert.equal(err, null);
-                    console.log("Updated 1 rating");
-                    res.send("success");
-                    db.close();
-                });
-            });
-        }
-    }
-
-    // If a rating by that user doesn't already exist, create a new one!
-    if (found == false) {
-        MongoClient.connect(url, function(err, db) {
-            assert.equal(err, null);
-
-            var collection = db.collection('ratings');
-            collection.insertOne(newRating, function(err, r) {
-                assert.equal(err, null);
-                console.log("Inserted 1 rating", newRating);
-                res.send("success");
+                res.send(r);
                 db.close();
             });
-        });
-    }
+    });
+    updateData();
 });
 
 app.post('/api/addBook', (req, res) => {
     var cookbook = req.body;
-    
-    MongoClient.connect(url, function(err, db) {
+
+    MongoClient.connect(url, function (err, db) {
         assert.equal(err, null);
 
         var collection = db.collection('cookbook');
 
-        collection.insertOne(cookbook, function(err, r) {
+        collection.insertOne(cookbook, function (err, r) {
             assert.equal(err, null);
-            console.log("inserted 1 recipe");
             res.send("success");
             db.close();
         });
     });
+    updateData();
 });
 
 app.post('/api/removeBook', (req, res) => {
     var cookbook = req.body;
 
-    MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function (err, db) {
         assert.equal(err, null);
 
         var collection = db.collection('cookbook');
 
-        collection.deleteOne({_id: cookbook._id}, function(err, r) {
+        collection.deleteOne({_id: cookbook._id}, function (err, r) {
             assert.equal(err, null);
             console.log("Deleted 1 recipe from cookbook");
             res.send("success");
             db.close();
         });
     });
+    updateData();
 });
 
-app.post('/api/login', function(req, res, next) {
-    console.log(req.body);
-    passport.authenticate('local', function(err, user, info) {
-        console.log("error?", err, user, info);
-        res.send('end');
+app.post('/api/login', function (req, res, next) {
+    passport.authenticate('local', function (err, user, info) {
+        // TODO: Should add error handling here.
+        user.password = "";
+        res.send(user);
     })(req, res, next);
 });
 
-app.listen(3000, function() {
+app.get('/api/google', passport.authenticate('google', {scope: ['profile']}));
+
+app.get('/auth/google/callback', passport.authenticate('google', {failureRedirect: '/login'}),
+    function (req, res) {
+        console.log("callback");
+        res.redirect('/');
+    }
+);
+
+app.get('/api/getuser', function (req, res) {
+    res.send(req.user);
+});
+
+app.get('/api/facebook', passport.authenticate('facebook'), function (req, res) {
+    console.log("/api/facebook", res);
+});
+
+app.get('/auth/facebook/callback', passport.authenticate('facebook'),
+    function (req, res) {
+        console.log("Inside callback");
+        res.redirect('/#/home');
+    }
+);
+
+
+app.listen(3000, function () {
     console.log('App listening on port 3000');
 });
 
-passport.use(new LocalStrategy(function(username, password, done) {
-    console.log("user/pass", username, password);
-    User.findOne({ username: username }, function(err, user) {
-        console.log("What in blazes is going on?", err, user);
-        if (err) {
-            console.log("error!", err);
-            return done(err);
+// Localstrategy passport auth
+passport.use(new LocalStrategy(function (username, password, done) {
+    for (var i = 0; i < users.length; i++) {
+        if (users[i].username === username) {
+            console.log("found username");
+            if (users[i].password === password) {
+                console.log("password matches");
+                return done(null, users[i]);
+            } else {
+                console.log("incorrect password");
+                return done(null, false, {message: 'Incorrect password.'});
+            }
         }
-        if (!user) {
-            return done(null, false, { message: 'Incorrect username.' });
-        }
-        if (!user.validPassword(password)) {
-            return done(null, false, { message: 'Incorrect password.' });
-        }
-        return done(null, user);
-    });
+    }
+    return done(null, false, {message: 'Incorrect username.'});
 }));
+
+// Google passport auth
+passport.use(new GoogleStrategy({
+        clientID: "539529748048-ue2jododsf3d4m6gtticj6k5lbapfho0.apps.googleusercontent.com",
+        clientSecret: "BFSm5Hr0SMnfRP0z7Mzrv5b0",
+        callbackURL: "http://localhost:3000/auth/google/callback"
+    },
+    function (accessToken, refreshToken, profile, done) {
+        console.log("google auth");
+        done(null, profile);
+        // User.findOrCreate({ googleId: profile.id }, function (err, user) {
+        //     return done(err, user);
+        // });
+    }
+));
+
+// Facebook passport auth
+passport.use(new FacebookStrategy({
+        clientID: '1735249653362566',
+        clientSecret: '3310f86a10551cf5aa8425b982a9da3d',
+        callbackURL: "http://localhost:3000/auth/facebook/callback"
+    },
+    function (accessToken, refreshToken, profile, cb) {
+        console.log("inside FacebookStrategy");
+        cb(null, profile);
+    }
+));
 
 // This function will create a basic database structure for testing purposes.
 function setupDatabase() {
-    MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function (err, db) {
         assert.equal(null, err);
         var newRecipe = {
             category: "Appetizer",
@@ -229,21 +292,21 @@ function setupDatabase() {
         };
 
         var newRating = {
-            userId: 1,
+            user_id: 1,
             rec_id: "1",
             rating: 5
         };
 
         var collection = db.collection('recipes');
 
-        collection.insertOne(newRecipe, function(err, docs) {
+        collection.insertOne(newRecipe, function (err, docs) {
             assert.equal(err, null);
             recipes = docs;
             newRating.rec_id = docs.ops[0]._id;
 
             var collection2 = db.collection('ratings');
 
-            collection2.insertOne(newRating, function(err, docs) {
+            collection2.insertOne(newRating, function (err, docs) {
                 assert.equal(err, null);
                 db.close();
             });
@@ -254,19 +317,19 @@ function setupDatabase() {
 // set up basic user in database.
 
 function setupUser() {
-    MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function (err, db) {
         assert.equal(null, err);
 
         var newUser = {
             username: 'a@a.a',
             password: 'a',
             displayName: 'a',
-            emails: [{ value: 'a@a.a' }]
+            provider: 'password'
         };
 
         var collection = db.collection('users');
 
-        collection.insertOne(newUser, function(err, docs) {
+        collection.insertOne(newUser, function (err, docs) {
             assert.equal(err, null);
         });
     });

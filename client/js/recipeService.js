@@ -27,20 +27,19 @@
         rs.userindex = -1;
         rs.curRecipe = $localStorage['curRecipe'];
         rs.addToCookBookButton = true;
+        rs.getRecipes = getRecipes;
         var key = "";
 
         getRecipes();
 
         // define functions
-        function getRecipes() { location += "getRecipes";
-            $http.get(location).catch(function(err){
+        function getRecipes() {
+            var apiLocation = location + "getRecipes";
+            $http.get(apiLocation).catch(function(err){
                 console.log(err);
-            })
-                .then(function(response) {
-                    rs.recipes.data = response.data;
-                    console.log(rs.recipes);
-                });
-
+            }).then(function(response) {
+                rs.recipes.data = response.data;
+            });
         }
 
         function addRecipe(recipe) {
@@ -89,29 +88,31 @@
         function login() {
             var priorlogin = false, count = 0;
 
-            $interval(function() {
-                if (rs.users.length == 0) {
-                    count++;
-                } else {
-                    for (var i = 0; i < rs.users.length; i++) {
-                        if (rs.users[i].user == rs.loggedin.user) {
-                            priorlogin = true;
-                            rs.userindex = i;
-                            key = rs.users[i].$id;
-                        }
-                    }
-
-                    if (!priorlogin) {
-                        rs.users.$add({user: rs.loggedin.user}).then(function(ref) {
-                            key = ref.key();
-                            firebook();
-                        });
-                        rs.userindex = rs.users.length;
-                    } else {
-                        firebook();
-                    }
-                }
-            }, 1000, 3);
+            
+            
+            // $interval(function() {
+            //     if (rs.users.length == 0) {
+            //         count++;
+            //     } else {
+            //         for (var i = 0; i < rs.users.length; i++) {
+            //             if (rs.users[i].user == rs.loggedin.user) {
+            //                 priorlogin = true;
+            //                 rs.userindex = i;
+            //                 key = rs.users[i].$id;
+            //             }
+            //         }
+            //
+            //         if (!priorlogin) {
+            //             rs.users.$add({user: rs.loggedin.user}).then(function(ref) {
+            //                 key = ref.key();
+            //                 firebook();
+            //             });
+            //             rs.userindex = rs.users.length;
+            //         } else {
+            //             firebook();
+            //         }
+            //     }
+            // }, 1000, 3);
 
             if (count == 3) {
                 alert("Unable to connect to database. Please try again later.");
