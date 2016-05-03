@@ -35,7 +35,18 @@ passport.serializeUser(function (user, done) {
 });
 
 passport.deserializeUser(function (obj, done) {
-    console.log("deserialize", obj);
+    //console.log("deserialize");
+    var newUser = { _id: obj.id, displayName: obj.displayName, provider: obj.provider };
+
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(err, null);
+        var collection = db.collection('users');
+        collection.updateOne({_id: obj.id}, newUser, { upsert: true }, function(err, r) {
+            assert.equal(err, null);
+            db.close();
+        })
+    });
+
     done(null, obj);
 });
 
@@ -182,6 +193,7 @@ app.post('/api/removeBook', (req, res) => {
 app.post('/api/login', function (req, res, next) {
     passport.authenticate('local', function (err, user, info) {
         // TODO: Should add error handling here.
+        user.password = "";
         res.send(user);
     })(req, res, next);
 });
@@ -195,7 +207,7 @@ app.get('/auth/google/callback', passport.authenticate('google', {failureRedirec
     }
 );
 
-app.get('api/getUser', function (req, res) {
+app.get('/api/getuser', function (req, res) {
     res.send(req.user);
 });
 
@@ -312,7 +324,7 @@ function setupUser() {
             username: 'a@a.a',
             password: 'a',
             displayName: 'a',
-            emails: [{value: 'a@a.a'}]
+            provider: 'password'
         };
 
         var collection = db.collection('users');
