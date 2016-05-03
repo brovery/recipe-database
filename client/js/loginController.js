@@ -52,6 +52,7 @@
                     }
                     recipeService.loggedin.username = response.data.displayName;
                     $("#loginImage").css("display", "block");
+                    $("#loginDef").css("display", "block");
                     lc.loginHideGoogle = true;
                     lc.loginHide = true;
                     lc.loginName = "Logout";
@@ -99,6 +100,7 @@
                 recipeService.loggedin.username = authData[authData.provider].displayName;
                 lc.loginImage = authData[authData.provider].profileImageURL;
                 $("#loginImage").css("display", "block");
+                
             }
             recipeService.loggedin.user = authData._id;
             recipeService.loggedin.loggedin = true;
