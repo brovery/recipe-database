@@ -4,9 +4,9 @@
     angular.module('loginController', [])
         .controller('loginController', loginController);
 
-    loginController.$inject = ['$timeout', 'recipeService', '$localStorage', '$http'];
+    loginController.$inject = ['recipeService', '$http'];
 
-    function loginController($timeout, recipeService, $localStorage, $http) {
+    function loginController(recipeService, $http) {
 
         // controller data and functions
         var lc = this;
@@ -32,8 +32,6 @@
         lc.recipes = recipeService.recipes;
         lc.users = recipeService.users;
         lc.loginImage = "";
-        // lc.$storage = $localStorage;
-        // lc.message = lc.$storage.loginData ? "Logged in to " + lc.$storage.loginData.provider : "No login data found.";
 
         getUser();
 
@@ -52,6 +50,7 @@
                     recipeService.loggedin.username = response.data.displayName;
                     $("#loginImage").css("display", "block");
                     lc.loginHideGoogle = true;
+                    lc.loginHideNative = true;
                     lc.loginHide = true;
                     lc.loginName = "Logout";
                     recipeService.loggedin.user = response.data.id;
@@ -59,22 +58,6 @@
                     recipeService.login();
                 }
             });
-        }
-
-        // This function sets up some data & dom objects.
-        function brandon(authData) {
-            console.log(authData);
-            if (authData.provider == "password") {
-                recipeService.loggedin.username = authData.displayName;
-                $("#loginDef").css("display", "block");
-            } else {
-                recipeService.loggedin.username = authData[authData.provider].displayName;
-                lc.loginImage = authData[authData.provider].profileImageURL;
-                $("#loginImage").css("display", "block");
-            }
-            recipeService.loggedin.user = authData._id;
-            recipeService.loggedin.loggedin = true;
-            // recipeService.login();
         }
 
 //Native login
@@ -124,8 +107,13 @@
             $http.post('/api/newLogin', newUser).then((res) => {
                 if (res.data.error) {
                     console.log("User Exists!");
+                    lc.failHide = true;
+                    lc.failLoginHide = true;
+                    lc.successHide = false;
                 } else {
                     console.log("User Created.");
+                    lc.successHide = true;
+                    lc.failHide = false;
                 }
             }).catch((err) => {
                 console.error("login creation error:", err);
@@ -144,57 +132,45 @@
                 console.log(res);
                 if (res.data == "Failed") {
                     console.log("Failed to update email. Either your old email or your password are wrong.");
+                    lc.failHide = true;
+                    lc.emailFail = true;
+                    lc.successHide = false;
                 } else {
                     console.log("Email successfully updated.");
+                    lc.successHide = true;
+                    lc.failHide = false;
+                    lc.emailFail = false;
                 }
 
             }).catch((err) => {
                 console.error("Email change error", err);
             });
-
-            // ref.changeEmail({
-            //     oldEmail: lc.oldEmail,
-            //     newEmail: lc.newEmail,
-            //     password: lc.password
-            // }, function (error) {
-            //     $timeout(function () {
-            //         if (error === null) {
-            //             console.log("Email changed successfully");
-            //             lc.successHide = true;
-            //             lc.failHide = false;
-            //             lc.emailFail = false;
-            //
-            //         } else {
-            //             console.log("Error changing email:", error);
-            //             lc.failHide = true;
-            //             lc.emailFail = true;
-            //             lc.successHide = false;
-            //         }
-            //     });
-            // });
         }
 
-//Change password - https://www.firebase.com/docs/web/guide/login/password.html
+//Change password
         function changePassword() {
-            ref.changePassword({
+            var changePass = {
                 email: lc.email,
                 oldPassword: lc.oldPassword,
                 newPassword: lc.newPassword
-            }, function (error) {
-                $timeout(function () {
-                    if (error === null) {
-                        console.log("Password changed successfully");
-                        lc.successHide = true;
-                        lc.failHide = false;
-                        lc.passFail = false;
-                    } else {
-                        console.log("Error changing password:", error);
-                        lc.failHide = true;
-                        lc.passFail = true;
-                        lc.successHide = false;
-                    }
-                });
+            };
+
+            $http.post('/api/changePass', changePass).then((res) => {
+                console.log(res);
+                if (res.data == "Failed") {
+                    console.log("Failed to update password. Either your email or password were incorrect.");
+                    lc.failHide = true;
+                    lc.passFail = true;
+                    lc.successHide = false;
+                } else {
+                    console.log("Password successfully updated.")
+                    lc.successHide = true;
+                    lc.failHide = false;
+                    lc.passFail = false;
+                }
             });
+
+
         }
     }
 }());

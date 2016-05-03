@@ -243,6 +243,29 @@ app.post('/api/changeEmail', function(req, res, next) {
     });
 });
 
+app.post('/api/changePass', function(req, res, next) {
+    var passChange = req.body;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(err, null);
+
+        var collection = db.collection('users');
+
+        collection.updateOne(
+            {username: passChange.email, password: passChange.oldPassword},
+            {username: passChange.email, password: passChange.newPassword},
+            function(err, r) {
+                if (r.result.nModified == 0) {
+                    console.log("error");
+                    res.send("Failed");
+                } else {
+                    res.send("Success");
+                }
+            }
+        );
+    });
+});
+
 app.post('/api/login', function (req, res, next) {
     passport.authenticate('local', function (err, user, info) {
         // TODO: Should add error handling here.
