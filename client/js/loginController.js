@@ -28,13 +28,12 @@
         lc.create = create;
         lc.changeEmail = changeEmail;
         lc.changePassword = changePassword;
-        lc.genericLogin = genericLogin;
         lc.loggedin = recipeService.loggedin;
         lc.recipes = recipeService.recipes;
         lc.users = recipeService.users;
         lc.loginImage = "";
-        lc.$storage = $localStorage;
-        lc.message = lc.$storage.loginData ? "Logged in to " + lc.$storage.loginData.provider : "No login data found.";
+        // lc.$storage = $localStorage;
+        // lc.message = lc.$storage.loginData ? "Logged in to " + lc.$storage.loginData.provider : "No login data found.";
 
         getUser();
 
@@ -62,36 +61,9 @@
             });
         }
 
-        // IMPORTANT: change to match the URL of your Firebase.
-        // var url = 'https://geo-recipes.firebaseio.com/';
-        // var ref = new Firebase(url);
-
-        // This code will check for a user in localstorage, and use that if it exists.
-        //if (lc.$storage.loginData) {
-        //    if (lc.$storage.loginData.provider == "password") {
-        //        console.log("Pulling login data from localstorage");
-        //        console.log(lc.$storage.loginData);
-        //        recipeService.loggedin.username = lc.$storage.loginData.displayName;
-        //
-        //        lc.loginHideNative = true;
-        //        // $("#loginDef").css("display", "block");
-        //    } else {
-        //        recipeService.loggedin.username = lc.$storage.loginData[lc.$storage.loginData.provider].displayName;
-        //        lc.loginImage = lc.$storage.loginData[lc.$storage.loginData.provider].profileImageURL;
-        //        $("#loginImage").css("display", "block");
-        //        lc.loginHideGoogle = true;
-        //    }
-        //    lc.loginHide = true;
-        //    lc.loginName = "Logout";
-        //    recipeService.loggedin.user = lc.$storage.loginData._id;
-        //    recipeService.loggedin.loggedin = true;
-        //    console.log(recipeService.loggedin);
-        //
-        //    recipeService.login();
-        //}
-
         // This function sets up some data & dom objects.
         function brandon(authData) {
+            console.log(authData);
             if (authData.provider == "password") {
                 recipeService.loggedin.username = authData.displayName;
                 $("#loginDef").css("display", "block");
@@ -114,8 +86,9 @@
                 $http.post(loginLoc, {service: 'password', username: lc.email, password: lc.password}).then((res) => {
                     lc.loginHide = true;
                     lc.loginHideNative = true;
-                    lc.$storage.loginData = res.data;
-                    brandon(res.data);
+                    console.log(res.config.data.username);
+                    recipeService.loggedin.username = res.config.data.username;
+                    $("#loginDef").css("display", "block");
                     lc.loginName = "Logout";
                 }).catch((err) => {
                     console.log('login error:', err);
@@ -123,71 +96,82 @@
             }
         }
 
-// Generic Login. This will log you in depending upon which link you click.
-        function genericLogin(serv) {
-            console.log(serv);
-        }
-
 //logout
-        // this removes google data from local storage
-        // to FULLY logout, you MUST go to google.com and logout
+        // this removes google data from the app and the server.
         function deleteData() {
-            // ref.unauth();
-            $localStorage.$reset();
-            // lc.$storage.loginData = {};
-            lc.message = 'google data deleted.';
-            recipeService.loggedin.user = "";
-            recipeService.loggedin.username = "";
-            recipeService.loggedin.loggedin = false;
-            lc.loginName = "Login";
-            lc.loginHideGoogle = false;
-            $("#loginDef").css("display", "none");
-            lc.loginHideNative = true;
-        }
-
-//Create native user - https://www.firebase.com/docs/web/guide/login/password.html
-        function create() {
-            ref.createUser({
-                email: lc.createEmail,
-                password: lc.createPassword
-            }, function (error, userData) {
-                $timeout(function () {
-                    if (error) {
-                        console.log("Error creating user:", error);
-                        lc.failHide = true;
-                        lc.failLoginHide = true;
-                        lc.successHide = false;
-                    } else {
-                        console.log("Successfully created user account with uid:", userData.uid);
-                        lc.successHide = true;
-                        lc.failHide = false;
-                    }
-                });
+            $http.get('/api/logout').then((res) => {
+                // lc.$storage.loginData = {};
+                lc.message = 'login data deleted.';
+                recipeService.loggedin.user = "";
+                recipeService.loggedin.username = "";
+                recipeService.loggedin.loggedin = false;
+                lc.loginName = "Login";
+                lc.loginHideGoogle = false;
+                $("#loginDef").css("display", "none");
+                lc.loginHideNative = true;
+            }).catch((err) => {
+                console.log("Logout Error!", err);
             });
         }
 
-//Change email - https://www.firebase.com/docs/web/guide/login/password.html
+// Create native user - passes user/pass to server, which generates and logs you in.
+        function create() {
+            var newUser = {
+                email: lc.createEmail,
+                password: lc.createPassword
+            };
+            
+            $http.post('/api/newLogin', newUser).then((res) => {
+                if (res.data.error) {
+                    console.log("User Exists!");
+                } else {
+                    console.log("User Created.");
+                }
+            }).catch((err) => {
+                console.error("login creation error:", err);
+            });
+        }
+
+// Change email.
         function changeEmail() {
-            ref.changeEmail({
+            var emailChange = {
                 oldEmail: lc.oldEmail,
                 newEmail: lc.newEmail,
                 password: lc.password
-            }, function (error) {
-                $timeout(function () {
-                    if (error === null) {
-                        console.log("Email changed successfully");
-                        lc.successHide = true;
-                        lc.failHide = false;
-                        lc.emailFail = false;
+            };
 
-                    } else {
-                        console.log("Error changing email:", error);
-                        lc.failHide = true;
-                        lc.emailFail = true;
-                        lc.successHide = false;
-                    }
-                });
+            $http.post('/api/changeEmail', emailChange).then((res) => {
+                console.log(res);
+                if (res.data == "Failed") {
+                    console.log("Failed to update email. Either your old email or your password are wrong.");
+                } else {
+                    console.log("Email successfully updated.");
+                }
+
+            }).catch((err) => {
+                console.error("Email change error", err);
             });
+
+            // ref.changeEmail({
+            //     oldEmail: lc.oldEmail,
+            //     newEmail: lc.newEmail,
+            //     password: lc.password
+            // }, function (error) {
+            //     $timeout(function () {
+            //         if (error === null) {
+            //             console.log("Email changed successfully");
+            //             lc.successHide = true;
+            //             lc.failHide = false;
+            //             lc.emailFail = false;
+            //
+            //         } else {
+            //             console.log("Error changing email:", error);
+            //             lc.failHide = true;
+            //             lc.emailFail = true;
+            //             lc.successHide = false;
+            //         }
+            //     });
+            // });
         }
 
 //Change password - https://www.firebase.com/docs/web/guide/login/password.html
