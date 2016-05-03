@@ -8,6 +8,8 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
+var expressSession = require('express-session');
+var cookieParser = require('cookie-parser');
 
 var url = 'mongodb://localhost:27017/recipes';
 
@@ -15,21 +17,36 @@ var url = 'mongodb://localhost:27017/recipes';
 // setupDatabase();
 // setupUser();
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(expressSession({secret: 'awesomeness', resave: true, saveUninitialized: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 app.use('/', express.static(__dirname + '/client'));
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
 
-passport.serializeUser(function(user, done) {
-    console.log("serialize", user);
+passport.serializeUser(function (user, done) {
+    console.log("serialize");
     done(null, user);
 });
 
-passport.deserializeUser(function(obj, done) {
-    console.log("deserialize", obj);
+passport.deserializeUser(function (obj, done) {
+    //console.log("deserialize");
+    var newUser = { _id: obj.id, displayName: obj.displayName, provider: obj.provider };
+
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(err, null);
+        var collection = db.collection('users');
+        collection.updateOne({_id: obj.id}, newUser, { upsert: true }, function(err, r) {
+            assert.equal(err, null);
+            db.close();
+        })
+    });
+
     done(null, obj);
 });
 
@@ -174,27 +191,27 @@ app.post('/api/removeBook', (req, res) => {
 });
 
 app.post('/api/login', function (req, res, next) {
-
-    if (req.body.service == 'password') {
-        passport.authenticate('local', function (err, user, info) {
-            // TODO: Should add error handling here.
-            res.send(user);
-        })(req, res, next);
-    } else {
-        console.log(req.body.service);
-        passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']});
-    }
+    passport.authenticate('local', function (err, user, info) {
+        // TODO: Should add error handling here.
+        user.password = "";
+        res.send(user);
+    })(req, res, next);
 });
 
-app.get('/api/google', passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
+app.get('/api/google', passport.authenticate('google', {scope: ['profile']}));
 
 app.get('/auth/google/callback', passport.authenticate('google', {failureRedirect: '/login'}),
     function (req, res) {
+        console.log("callback");
         res.redirect('/');
     }
 );
 
-app.get('/api/facebook', passport.authenticate('facebook'), function(req, res) {
+app.get('/api/getuser', function (req, res) {
+    res.send(req.user);
+});
+
+app.get('/api/facebook', passport.authenticate('facebook'), function (req, res) {
     console.log("/api/facebook", res);
 });
 
@@ -307,7 +324,7 @@ function setupUser() {
             username: 'a@a.a',
             password: 'a',
             displayName: 'a',
-            emails: [{value: 'a@a.a'}]
+            provider: 'password'
         };
 
         var collection = db.collection('users');
