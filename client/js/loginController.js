@@ -36,33 +36,57 @@
         lc.$storage = $localStorage;
         lc.message = lc.$storage.loginData ? "Logged in to " + lc.$storage.loginData.provider : "No login data found.";
 
+        getUser();
+
+        function getUser() {
+            $http.get('/api/getuser').catch(function(err) {
+                console.log(err);
+            }).then(function(response) {
+                console.log(response);
+                if (response.data == "") {
+                    console.log("No current user found!");
+                } else {
+                    recipeService.loggedin.username = response.data.displayName;
+                    lc.loginImage = response.data._json.image.url;
+                    console.log(lc.loginImage);
+                    $("#loginImage").css("display", "block");
+                    lc.loginHideGoogle = true;
+                    lc.loginHide = true;
+                    lc.loginName = "Logout";
+                    recipeService.loggedin.user = response.data.id;
+                    recipeService.loggedin.loggedin = true;
+                    recipeService.login();
+                }
+            });
+        }
+
         // IMPORTANT: change to match the URL of your Firebase.
         // var url = 'https://geo-recipes.firebaseio.com/';
         // var ref = new Firebase(url);
 
         // This code will check for a user in localstorage, and use that if it exists.
-        if (lc.$storage.loginData) {
-            if (lc.$storage.loginData.provider == "password") {
-                console.log("Pulling login data from localstorage");
-                console.log(lc.$storage.loginData);
-                recipeService.loggedin.username = lc.$storage.loginData.displayName;
-
-                lc.loginHideNative = true;
-                // $("#loginDef").css("display", "block");
-            } else {
-                recipeService.loggedin.username = lc.$storage.loginData[lc.$storage.loginData.provider].displayName;
-                lc.loginImage = lc.$storage.loginData[lc.$storage.loginData.provider].profileImageURL;
-                $("#loginImage").css("display", "block");
-                lc.loginHideGoogle = true;
-            }
-            lc.loginHide = true;
-            lc.loginName = "Logout";
-            recipeService.loggedin.user = lc.$storage.loginData._id;
-            recipeService.loggedin.loggedin = true;
-            console.log(recipeService.loggedin);
-
-            recipeService.login();
-        }
+        //if (lc.$storage.loginData) {
+        //    if (lc.$storage.loginData.provider == "password") {
+        //        console.log("Pulling login data from localstorage");
+        //        console.log(lc.$storage.loginData);
+        //        recipeService.loggedin.username = lc.$storage.loginData.displayName;
+        //
+        //        lc.loginHideNative = true;
+        //        // $("#loginDef").css("display", "block");
+        //    } else {
+        //        recipeService.loggedin.username = lc.$storage.loginData[lc.$storage.loginData.provider].displayName;
+        //        lc.loginImage = lc.$storage.loginData[lc.$storage.loginData.provider].profileImageURL;
+        //        $("#loginImage").css("display", "block");
+        //        lc.loginHideGoogle = true;
+        //    }
+        //    lc.loginHide = true;
+        //    lc.loginName = "Logout";
+        //    recipeService.loggedin.user = lc.$storage.loginData._id;
+        //    recipeService.loggedin.loggedin = true;
+        //    console.log(recipeService.loggedin);
+        //
+        //    recipeService.login();
+        //}
 
         // This function sets up some data & dom objects.
         function brandon(authData) {
@@ -88,8 +112,6 @@
                 $http.post(loginLoc, {service: 'password', username: lc.email, password: lc.password}).then((res) => {
                     lc.loginHide = true;
                     lc.loginHideNative = true;
-                    res.data.provider = "password";
-                    res.data.password = "";
                     lc.$storage.loginData = res.data;
                     brandon(res.data);
                     lc.loginName = "Logout";
@@ -102,17 +124,18 @@
 // Generic Login. This will log you in depending upon which link you click.
         function genericLogin(serv) {
             console.log(serv);
+            // location.href="http://localhost:3000/api/google";
 
-            $http.get('http://localhost:3000/api/google')
-                .then(function(res) {
-                    console.log("response:", res);
-                    lc.message = 'Logged in to ' + serv;
-                    lc.loginHide = true;
-                    lc.loginHideGoogle = true;
-                    // lc.$storage.loginData = res;
-                }).catch(function(err) {
-                    console.error(err);
-            });
+            // $http.get('http://localhost:3000/api/google')
+            //     .then(function(res) {
+            //         console.log("response:", res);
+            //         lc.message = 'Logged in to ' + serv;
+            //         lc.loginHide = true;
+            //         lc.loginHideGoogle = true;
+            //         // lc.$storage.loginData = res;
+            //     }).catch(function(err) {
+            //         console.error(err);
+            // });
 
 
             // ref.authWithOAuthPopup(serv, function (error, authData) {
