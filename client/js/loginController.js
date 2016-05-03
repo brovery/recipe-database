@@ -42,13 +42,15 @@
             $http.get('/api/getuser').catch(function(err) {
                 console.log(err);
             }).then(function(response) {
-                console.log(response);
                 if (response.data == "") {
                     console.log("No current user found!");
                 } else {
+                    if (response.data.provider == 'facebook') {
+                        lc.loginImage = "/img/fb.png";
+                    } else {
+                        lc.loginImage = response.data._json.image.url;
+                    }
                     recipeService.loggedin.username = response.data.displayName;
-                    lc.loginImage = response.data._json.image.url;
-                    console.log(lc.loginImage);
                     $("#loginImage").css("display", "block");
                     lc.loginHideGoogle = true;
                     lc.loginHide = true;
@@ -124,34 +126,6 @@
 // Generic Login. This will log you in depending upon which link you click.
         function genericLogin(serv) {
             console.log(serv);
-            // location.href="http://localhost:3000/api/google";
-            
-            $http.get('http://localhost:3000/api/google')
-                .then(function (res) {
-                    console.log("response:", res);
-                    lc.message = 'Logged in to ' + serv;
-                    lc.loginHide = true;
-                    lc.loginHideGoogle = true;
-                    // lc.$storage.loginData = res;
-                }).catch(function (err) {
-                console.error(err);
-            });
-
-
-            // ref.authWithOAuthPopup(serv, function (error, authData) {
-            //     if (error) {
-            //         console.log('Log in to ' + serv + ' Failed', error);
-            //         lc.message = 'Log in to ' + serv + ' Failed ' + error;
-            //     } else {
-            //         console.log('Logged in to ' + serv);
-            //         lc.message = 'Logged in to ' + serv;
-            //         lc.loginHide = true;
-            //         lc.loginHideGoogle = true;
-            //         lc.$storage.loginData = authData;
-            //         brandon(authData);
-            //         lc.loginName = "Logout";
-            //     }
-            // });
         }
 
 //logout
