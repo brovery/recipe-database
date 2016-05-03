@@ -44,7 +44,7 @@ passport.deserializeUser(function (obj, done) {
         collection.updateOne({_id: obj.id}, newUser, { upsert: true }, function(err, r) {
             assert.equal(err, null);
             db.close();
-        })
+        });
     });
 
     done(null, obj);
