@@ -48,7 +48,6 @@
                         lc.loginImage = response.data._json.image.url;
                     }
                     recipeService.loggedin.username = response.data.displayName;
-                    console.log(lc.loggedin.username);
                     $("#loginImage").css("display", "block");
                     lc.loginHideGoogle = true;
                     lc.loginHideNative = true;
