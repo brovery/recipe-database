@@ -190,12 +190,93 @@ app.post('/api/removeBook', (req, res) => {
     updateData();
 });
 
+app.post('/api/newLogin', function(req, res, next) {
+    var newUser = {
+        username: req.body.email,
+        password: req.body.password
+    };
+    console.log(newUser);
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(err, null);
+
+        var collection = db.collection('users');
+
+        // Check if username already exists. If it does, then return an error. If not, add to DB.
+        collection.find({username: newUser.username}).toArray((err, docs) => {
+            assert.equal(err, null);
+            if (docs.length == 0) {
+                console.log("Creating new user.");
+                collection.insertOne(newUser, function(err, r) {
+                    assert.equal(err, null);
+                    res.send("success");
+                    db.close();
+                });
+            } else {
+                console.log("User found, not creating new user.");
+                res.send({error: "User exists"});
+                db.close();
+            }
+        });
+    });
+});
+
+app.post('/api/changeEmail', function(req, res, next) {
+    var emailChange = req.body;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(err, null);
+
+        var collection = db.collection('users');
+
+        collection.updateOne(
+            {username: emailChange.oldEmail, password: emailChange.password}, 
+            {username: emailChange.newEmail, password: emailChange.password},
+            function(err, r) {
+                if (r.result.nModified == 0) {
+                    console.log("error");
+                    res.send("Failed");
+                } else {
+                    res.send("Success");
+                }
+            }
+        );
+    });
+});
+
+app.post('/api/changePass', function(req, res, next) {
+    var passChange = req.body;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(err, null);
+
+        var collection = db.collection('users');
+
+        collection.updateOne(
+            {username: passChange.email, password: passChange.oldPassword},
+            {username: passChange.email, password: passChange.newPassword},
+            function(err, r) {
+                if (r.result.nModified == 0) {
+                    console.log("error");
+                    res.send("Failed");
+                } else {
+                    res.send("Success");
+                }
+            }
+        );
+    });
+});
+
 app.post('/api/login', function (req, res, next) {
     passport.authenticate('local', function (err, user, info) {
         // TODO: Should add error handling here.
         user.password = "";
         res.send(user);
     })(req, res, next);
+});
+
+app.get('/api/logout', function(req, res, next) {
+    req.logout();
+    res.redirect('/');
 });
 
 app.get('/api/google', passport.authenticate('google', {scope: ['profile']}));

@@ -74,7 +74,7 @@
                 </ul>
                 <img ng-if="lc.loginHideGoogle" id="loginImage" ng-src="{{ lc.loginImage }}">
                 <!--<img ng-if="lc.loginHideGithub" ng-src="{{ lc.ghData.github.profileImageURL }}" style="width: 30px;">-->
-                <div ng-if="lc.loginHideNative" id="loginDef">{{lc.$storage.loginData.displayName}}</div>
+                <div ng-if="lc.loginHideNative" id="loginDef">{{lc.loggedin.username}}</div>
             </div>
         </div>
     </div>
