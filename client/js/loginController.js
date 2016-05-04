@@ -73,6 +73,7 @@
                     recipeService.loggedin.username = res.config.data.username;
                     $("#loginDef").css("display", "block");
                     lc.loginName = "Logout";
+                    recipeService.login();
                 }).catch((err) => {
                     console.log('login error:', err);
                 });

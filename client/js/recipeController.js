@@ -13,6 +13,7 @@
         rc.recipes = recipeService.recipes;
         rc.recipe = recipe;
         rc.loggedin = recipeService.loggedin;
+        rc.cookbook = recipeService.cookbook;
         rc.addToCookBookButton = recipeService.addToCookBookButton;
         rc.initRecipe = initRecipe;
         rc.addtoCookBook = addtoCookBook;
@@ -21,11 +22,9 @@
         rc.getRating = getRating;
         rc.temp = temp;
 
-        console.log(rc.recipe);
-
         if (rc.recipe == undefined) {
-            console.log("hehe");
             rc.recipe = $localStorage.curRecipe;
+            console.log(rc.recipe);
         }
 
         // define functions
