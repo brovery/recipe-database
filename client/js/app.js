@@ -59,15 +59,22 @@
                         templateUrl: "templates/recipe.html",
                         controller: "recipeController as rc",
                         resolve: {
-                            recipe: function ($stateParams, recipeService, $localStorage) {
+                            recipe: function ($stateParams, recipeService, $localStorage, $timeout) {
                                 console.log("recipeService id", recipeService.recipes);
-                                // TODO: On reload, recipes.data is undefined (asynch?). Fix it!
-                                for (var i = 0; i < recipeService.recipes.data.length; i++) {
-                                    if (recipeService.recipes.data[i]._id == $stateParams.id) {
-                                        $localStorage.curRecipe = recipeService.recipes.data[i];
-                                        return recipeService.recipes.data[i];
+                                // I had to throw a very short timeout here to allow data to load before it runs this check.
+                                // It's hackery, but it works.
+                                $timeout(function(){
+                                    console.log(recipeService.recipes);
+                                    for (var i = 0; i < recipeService.recipes.data.length; i++) {
+                                        if (recipeService.recipes.data[i]._id == $stateParams.id) {
+                                            $localStorage.curRecipe = recipeService.recipes.data[i];
+                                            return recipeService.recipes.data[i];
+                                        }
                                     }
-                                }
+                                }, 5);
+
+
+
                             }
                         }
                     });
