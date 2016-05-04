@@ -104,6 +104,45 @@ app.get('/api/getRecipes', (req, res) => {
     res.send(recipes);
 });
 
+
+//Bandon DO NOT LOOK
+app.get('/api/getRating', (req, res) => {
+    var param = req.query;
+    console.log(param);
+    var count = 0;
+    var sum = 0;
+    
+    for (var i = 0; i < ratings.length; i++) {
+        if (ratings[i].rec_id === param.rec_id) {
+            count++;
+
+            sum += ratings[i].rating;
+        }
+    }
+       var avg = (sum / count);
+        console.log(avg);
+        var group = {
+            rec_id: param.rec_id,
+            rating: avg
+        };
+
+    console.log("Sending recipes", group);
+    res.send(group);
+});
+
+app.get('/api/getCookbook', (req, res) => {
+    var user_id = req.query.user_id;
+    var myCookbook = [];
+
+    for (var i = 0; i < cookbook.length; i++) {
+        if (cookbook[i].user_id == user_id) {
+            myCookbook.push(cookbook[i]);
+        }
+    }
+
+    res.send(myCookbook);
+});
+
 app.post('/api/addRecipe', (req, res) => {
     var newRecipe = req.body;
     // Will need to add some error-checking to this to confirm that the recipe is set up correctly.
