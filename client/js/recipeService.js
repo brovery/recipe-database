@@ -21,7 +21,7 @@
         rs.addtoCookBook = addtoCookBook;
         rs.initRecipe = initRecipe;
         rs.removeRecipe = removeRecipe;
-        rs.getRating = getRating;
+        //rs.getRating = getRating;
         rs.loggedin = {loggedin: false};
         rs.login = login;
         rs.userindex = -1;
@@ -141,26 +141,26 @@
             }, 1000, 3);
         }
 
-        function getRating(key){
-            var rating = new Firebase(reciperef + '/' + key + '/rating');
-            var rate = $firebaseArray(rating);
-            var total = 0;
-
-            rate.$loaded(function() {
-                var len = rate.length - 1;
-                if (len !== 0) {
-                    for (var i = 0; i < len; i++) {
-                        total += rate[i].rating;
-                    }
-                    total /= len;
-                }else{
-                    total = 0;
-                }
-            }).then(function(){
-                rs.rateTotal.rating = total.toPrecision(1);
-            });
-
-        }
+        // function getRating(key){
+        //     var rating = new Firebase(reciperef + '/' + key + '/rating');
+        //     var rate = $firebaseArray(rating);
+        //     var total = 0;
+        //
+        //     rate.$loaded(function() {
+        //         var len = rate.length - 1;
+        //         if (len !== 0) {
+        //             for (var i = 0; i < len; i++) {
+        //                 total += rate[i].rating;
+        //             }
+        //             total /= len;
+        //         }else{
+        //             total = 0;
+        //         }
+        //     }).then(function(){
+        //         rs.rateTotal.rating = total.toPrecision(1);
+        //     });
+        //
+        // }
 
     }
 
