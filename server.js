@@ -104,6 +104,32 @@ app.get('/api/getRecipes', (req, res) => {
     res.send(recipes);
 });
 
+
+//Bandon DO NOT LOOK
+app.get('/api/getRating', (req, res) => {
+    var param = req.query;
+    console.log(param);
+    var count = 0;
+    var sum = 0;
+    
+    for (var i = 0; i < ratings.length; i++) {
+        if (ratings[i].rec_id === param.rec_id) {
+            count++;
+
+            sum += ratings[i].rating;
+        }
+    }
+       var avg = (sum / count);
+        console.log(avg);
+        var group = {
+            rec_id: param.rec_id,
+            rating: avg
+        };
+
+    console.log("Sending recipes", group);
+    res.send(group);
+});
+
 app.get('/api/getCookbook', (req, res) => {
     var user_id = req.query.user_id;
     var myCookbook = [];
