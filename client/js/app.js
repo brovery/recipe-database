@@ -17,8 +17,6 @@
             "app.filters",
             "editrecipeController",
             "infinite-scroll"
-
-
         ])
 
         .config(["$stateProvider", "$urlRouterProvider", "$localStorageProvider",
@@ -61,17 +59,19 @@
                         templateUrl: "templates/recipe.html",
                         controller: "recipeController as rc",
                         resolve: {
-                            recipe: function ($stateParams, recipeService, $localStorage) {
-                                for (var i = 0; i < recipeService.recipes.length; i++) {
-                                    if (recipeService.recipes[i].$id == $stateParams.id) {
-                                        $localStorage.curRecipe = recipeService.recipes[i];
-                                        return recipeService.recipes[i];
+                            recipe: function ($stateParams, recipeService, $localStorage, $timeout) {
+                                // TODO: Get recipe page to load on refresh. Don't use timeout.
+                                for (var i = 0; i < recipeService.recipes.data.length; i++) {
+                                    console.log($stateParams.id);
+                                    if (recipeService.recipes.data[i]._id == $stateParams.id) {
+                                        console.log("Updating current recipe");
+                                        $localStorage.curRecipe = recipeService.recipes.data[i];
+                                        return recipeService.recipes.data[i];
                                     }
                                 }
                             }
                         }
-                    })
-                    ;
+                    });
 
                 // if none of the above states are matched, use this as the fallback
                 $urlRouterProvider.otherwise("/home");

@@ -4,13 +4,16 @@
     angular.module('newCtrl', [])
         .controller('newCtrl', newCtrl);
 
-    newCtrl.$inject = ['Upload', 'recipeService'];
+    newCtrl.$inject = ['Upload', 'recipeService', '$http'];
 
-    function newCtrl(Upload, recipeService) {
+    function newCtrl(Upload, recipeService, $http) {
+
+        var location = 'http://localhost:3000/api/addRecipe';
 
         // list everything
         var nc = this;
         nc.recipes = recipeService.recipes;
+
         var Recipe = function () {
             this.name = "";
             this.prepTime = "";
@@ -18,8 +21,8 @@
             this.ingredients = [];
             this.instructions = [];
             this.category = '';
-            this.rating = {};
         };
+
         var defaultImage = 'img/Lets-get-cooking.png';
         nc.imageShow = defaultImage;
         nc.name = '';
@@ -40,11 +43,7 @@
         nc.editName = editName;
 
         function createRecipe() {
-
-            if (nc.imageShow === defaultImage) {
-
-            }
-
+            
             var newRecipe = new Recipe();
             newRecipe.name = nc.name;
             if (nc.imageShow === defaultImage) {
@@ -57,7 +56,6 @@
             newRecipe.category = nc.category;
             newRecipe.private = nc.privacy;
             newRecipe.userName = nc.userName;
-            newRecipe.rating = {placeholder: 0};
             for (var i = 0; i < nc.ingredients.length; i++) {
                 newRecipe.ingredients.push({ingredient: nc.ingredients[i].name, qty: nc.ingredients[i].qty});
             }
@@ -77,8 +75,10 @@
         }
 
         function addRecipe(recipe) {
-            nc.recipes.$add(recipe).then(function(ref){
-                var recipesId = ref.key();
+            $http.post(location, recipe).then(function(ref){
+                // ref.data[0] is the object added to the database. This pushes the same object into the recipes array.
+                recipeService.recipes.data.push(ref.data[0]); 
+                var recipesId = ref.data[0]._id;
                 recipeService.addtoCookBook(recipesId);
             });
         }

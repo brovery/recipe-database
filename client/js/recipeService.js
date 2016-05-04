@@ -27,20 +27,18 @@
         rs.userindex = -1;
         rs.curRecipe = $localStorage['curRecipe'];
         rs.addToCookBookButton = true;
-        var key = "";
+        rs.getRecipes = getRecipes;
 
         getRecipes();
 
         // define functions
-        function getRecipes() { location += "getRecipes";
-           console.log('hi');
-            $http.get(location).catch(function(err){
+        function getRecipes() {
+            var apiLocation = location + "getRecipes";
+            $http.get(apiLocation).catch(function (err) {
                 console.log(err);
-            })
-                .then(function(response) {
-                    console.log(response.data);
-                    rs.recipes.data = response.data;
-                });
+            }).then(function (response) {
+                rs.recipes.data = response.data;
+            });
         }
 
         function addRecipe(recipe) {
@@ -52,34 +50,26 @@
         }
 
         function addtoCookBook(id) {
-            // Add the user to the recipe.
-            //for (var i = 0; i<rs.recipes.length; i++) {
-            //    if (rs.recipes[i].$id == id) {
-            //        var user = rs.loggedin.user;
-            //        rs.recipes[i].users[user] = true;
-            //        rs.recipes.$save(i);
-            //    }
-            //}
+            console.log(id);
+            var add = {
+                user_id: rs.loggedin.user,
+                rec_id: id
+            };
 
-            // Add the recipe to the user.
-            var alreadyadded = false;
-            for (var i = 0; i < rs.cookbook.length; i++) {
-                if (id == rs.cookbook[i].recipe) {
-                    alreadyadded = true;
-                    console.log("Already Added!");
+            $http.post('/api/addBook', add).then(function (response) {
+                console.log(response.data);
+                if (response.data.error) {
+                    console.log("Add failed - recipe is already in your cookbook.");
+                } else {
+                    console.log("Recipe added to cookbook.");
                 }
-            }
-            if (!alreadyadded) {
-                rs.cookbook.$add({recipe: id});
-                rs.addToCookBookButton = false;
-                console.log("Added Recipe to your cookbook!");
-            }
+            });
         }
 
         function removeRecipe(id) {
             for (var i = 0; i < rs.cookbook.length; i++) {
                 if (rs.cookbook[i].recipe == id) {
-                    rs.cookbook.$remove(rs.cookbook[i]).catch(function(error) {
+                    rs.cookbook.$remove(rs.cookbook[i]).catch(function (error) {
                         console.log(error);
                     });
                 }
@@ -87,75 +77,39 @@
         }
 
         function login() {
-            var priorlogin = false, count = 0;
 
-            $interval(function() {
-                if (rs.users.length == 0) {
-                    count++;
-                } else {
-                    for (var i = 0; i < rs.users.length; i++) {
-                        if (rs.users[i].user == rs.loggedin.user) {
-                            priorlogin = true;
-                            rs.userindex = i;
-                            key = rs.users[i].$id;
-                        }
-                    }
+            // make a call to the api to get the cookbook for the current user.
+            // console.log(rs.loggedin);
+            $http.get('/api/getCookbook?user_id=' + rs.loggedin.user).catch(function (err) {
+                console.log(err);
+            }).then(function (cookbookData) {
+                rs.cookbook = cookbookData.data;
 
-                    if (!priorlogin) {
-                        rs.users.$add({user: rs.loggedin.user}).then(function(ref) {
-                            key = ref.key();
-                            firebook();
-                        });
-                        rs.userindex = rs.users.length;
-                    } else {
-                        firebook();
+                // Check through the cookbook for the current recipe, and set rs.addtocookbookbutton to false if it's there.
+                for (var i = 0; i < rs.cookbook.length; i++) {
+                    if (rs.curRecipe._id == rs.cookbook[i].rec_id) {
+                        rs.addToCookBookButton = false;
                     }
                 }
-            }, 1000, 3);
-
-            if (count == 3) {
-                alert("Unable to connect to database. Please try again later.");
-            }
+            });
         }
 
-        function firebook() {
-            // Create link to the user's cookbook.
-            var cookbookurl = users + "/" + key + "/recipes";
-            var mycookbook = new Firebase(cookbookurl);
-            rs.cookbook = $firebaseArray(mycookbook);
-            checkCookBook();
-        }
-
-        function checkCookBook() {
-            var count = 0;
-            //console.log(rs.curRecipe.$id);
-            $interval(function() {
-                if (rs.cookbook.length != 0) {
-                    for (var i = 0; i < rs.cookbook.length; i++) {
-                        if (rs.cookbook[i].recipe == rs.curRecipe.$id) {
-                            rs.addToCookBookButton = false;
-                        }
-                    }
-                }
-            }, 1000, 3);
-        }
-
-        function getRating(key){
+        function getRating(key) {
             var rating = new Firebase(reciperef + '/' + key + '/rating');
             var rate = $firebaseArray(rating);
             var total = 0;
 
-            rate.$loaded(function() {
+            rate.$loaded(function () {
                 var len = rate.length - 1;
                 if (len !== 0) {
                     for (var i = 0; i < len; i++) {
                         total += rate[i].rating;
                     }
                     total /= len;
-                }else{
+                } else {
                     total = 0;
                 }
-            }).then(function(){
+            }).then(function () {
                 rs.rateTotal.rating = total.toPrecision(1);
             });
 
