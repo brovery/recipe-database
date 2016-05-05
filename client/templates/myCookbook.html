@@ -4,10 +4,10 @@
     <div ng-repeat="recipe in mcc.recipes.data | cookbook"> <!---->
         <div class="col-lg-3 col-md-4 col-xs-6 thumb">
             <h4><span ng-bind="recipe.name"></span></h4>
-            <a href="#/{{recipe.$id}}">
+            <a href="#/{{recipe._id}}">
                 <img class="img-responsive" ng-src={{recipe.image}} alt="Lets get cooking">
             </a>
-            <button class="btn btn-default btn-remove" ng-click="mcc.removeRecipe(recipe.$id)">Remove from My Cookbook</button>
+            <button class="btn btn-default btn-remove" ng-click="mcc.removeRecipe(recipe._id)">Remove from My Cookbook</button>
         </div>
     </div>
 

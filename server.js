@@ -115,7 +115,7 @@ app.get('/api/getRecipes', (req, res) => {
 //Bandon DO NOT LOOK
 app.get('/api/getRating', (req, res) => {
     var param = req.query;
-    console.log(param);
+    // console.log(param);
     var count = 0;
     var sum = 0;
     
@@ -127,13 +127,13 @@ app.get('/api/getRating', (req, res) => {
         }
     }
        var avg = (sum / count);
-        console.log(avg);
+        // console.log(avg);
         var group = {
             rec_id: param.rec_id,
             rating: avg
         };
 
-    console.log("Sending recipes", group);
+    // console.log("Sending recipes", group);
     res.send(group);
 });
 
@@ -212,7 +212,6 @@ app.post('/api/addBook', (req, res) => {
 
             collection.find({user_id: cookbook.user_id, rec_id: cookbook.rec_id}).toArray((err, docs) => {
                 assert.equal(err, null);
-                console.log(docs);
                 if (docs.length == 0) {
                     console.log("Adding a new recipe to cookbook");
                     collection.insertOne(cookbook, function (err, r) {
@@ -235,20 +234,19 @@ app.post('/api/addBook', (req, res) => {
 
 app.post('/api/removeBook', (req, res) => {
     var cookbook = req.body;
-
     MongoClient.connect(url, function (err, db) {
         assert.equal(err, null);
-
+    
         var collection = db.collection('cookbook');
-
-        collection.deleteOne({_id: cookbook._id}, function (err, r) {
+    
+        collection.deleteOne({rec_id: cookbook.rec_id}, function (err, r) {
             assert.equal(err, null);
             console.log("Deleted 1 recipe from cookbook");
-            res.send("success");
+            updateData();
+            res.send("Success"); 
             db.close();
         });
     });
-    updateData();
 });
 
 app.post('/api/newLogin', function(req, res, next) {
@@ -256,7 +254,7 @@ app.post('/api/newLogin', function(req, res, next) {
         username: req.body.email,
         password: req.body.password
     };
-    console.log(newUser);
+    // console.log(newUser);
     MongoClient.connect(url, function(err, db) {
         assert.equal(err, null);
 
@@ -354,7 +352,7 @@ app.get('/api/getuser', function (req, res) {
 });
 
 app.get('/api/facebook', passport.authenticate('facebook'), function (req, res) {
-    console.log("/api/facebook", res);
+    // console.log("/api/facebook", res);
 });
 
 app.get('/auth/facebook/callback', passport.authenticate('facebook'),
@@ -363,6 +361,23 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook'),
         res.redirect('/#/home');
     }
 );
+
+app.post('/api/editRecipe', function(req, res, next) {
+    var newRec = req.body;
+
+    MongoClient.connect(url, function(err, db) {
+        assert.equal(err, null);
+
+        var collection = db.collection('recipes');
+
+        collection.insertOne(newRec, (err, r) => {
+            assert.equal(err, null);
+            res.send(r.ops);
+            db.close();
+            updateData();
+        });
+    });
+});
 
 
 app.listen(3000, function () {
