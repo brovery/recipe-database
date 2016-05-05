@@ -181,20 +181,48 @@ app.post('/api/rate', (req, res) => {
     updateData();
 });
 
+app.get('/api/getCookbook', (req, res) => {
+    var user_id = req.query.user_id;
+    var myCookbook = [];
+
+    for (var i = 0; i < cookbook.length; i++) {
+        if (cookbook[i].user_id == user_id) {
+            myCookbook.push(cookbook[i]);
+        }
+    }
+
+    res.send(myCookbook);
+});
+
 app.post('/api/addBook', (req, res) => {
     var cookbook = req.body;
 
-    MongoClient.connect(url, function (err, db) {
-        assert.equal(err, null);
-
-        var collection = db.collection('cookbook');
-
-        collection.insertOne(cookbook, function (err, r) {
+    if (cookbook.user_id) {
+        MongoClient.connect(url, function (err, db) {
             assert.equal(err, null);
-            res.send("success");
-            db.close();
+
+            var collection = db.collection('cookbook');
+
+            collection.find({user_id: cookbook.user_id, rec_id: cookbook.rec_id}).toArray((err, docs) => {
+                assert.equal(err, null);
+                console.log(docs);
+                if (docs.length == 0) {
+                    console.log("Adding a new recipe to cookbook");
+                    collection.insertOne(cookbook, function (err, r) {
+                        assert.equal(err, null);
+                        res.send("success");
+                        db.close();
+                    });
+                } else {
+                    console.log("That recipe is already in that cookbook");
+                    res.send({error: "Recipe already in cookbook"});
+                    db.close();
+                }
+            });
         });
-    });
+    } else {
+        res.send({error: "You are not logged in. Please log in to add recipes to your cookbook"});
+    }
     updateData();
 });
 
