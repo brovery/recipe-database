@@ -54,7 +54,7 @@
 
     <div class="row">
         <a href="#/editRecipe">
-            <button class="btn btn-primary" ng-click="rc.editRecipe()">Edit this Recipe</button>
+            <button ng-if="rc.loggedin.user" class="btn btn-primary" ng-click="rc.editRecipe()">Edit this Recipe</button>
         </a>
         <!-- TODO: Fix the button to show/hide correctly, according to loggedin & already existing states. -->
         <button class="btn btn-primary add-button" id="addToCookbook"

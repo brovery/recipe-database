@@ -62,9 +62,7 @@
                             recipe: function ($stateParams, recipeService, $localStorage, $timeout) {
                                 // TODO: Get recipe page to load on refresh. Don't use timeout.
                                 for (var i = 0; i < recipeService.recipes.data.length; i++) {
-                                    console.log($stateParams.id);
                                     if (recipeService.recipes.data[i]._id == $stateParams.id) {
-                                        console.log("Updating current recipe");
                                         $localStorage.curRecipe = recipeService.recipes.data[i];
                                         return recipeService.recipes.data[i];
                                     }
