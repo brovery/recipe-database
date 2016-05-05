@@ -11,6 +11,13 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
 
+var http = require('http');
+var port = process.env.port || 1337;
+http.createServer(function(req, res){
+    res.writeHead(200, {'Content-Type':'text/plain'});
+    res.end('Hello World\n');
+}).listen(port);
+
 var url = 'mongodb://localhost:27017/recipes';
 
 // The setupDatabase function call will set up a basic database structure with test data. Uncomment it if you want the basic structure set up.
