@@ -23,6 +23,7 @@
             
             $http.post('/api/editRecipe', ec.curRecipe).then((res) => {
                 recipeService.recipes.data.push(res.data[0]);
+                recipeService.addtoCookBook(res.data[0]._id);
                 $location.path("/");
             });
         }
