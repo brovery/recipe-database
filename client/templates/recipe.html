@@ -11,8 +11,8 @@
                 Cook Time: <span ng-bind="rc.recipe.cookTime | times"></span>
             </div>
             <div class="col-sm-6">
-                <span class="col-sm-1 col-sm-offset-3" ng-bind="rc.data.rating"></span>
-                <div class="rating col-sm-6">
+                <span class="col-xs-1 col-xs-offset-2" ng-bind="rc.data.rating"></span>
+                <div class="rating">
                     <span ng-click="rc.star(rc.recipe._id, 5)" id="5star">☆</span>
                     <span ng-click="rc.star(rc.recipe._id, 4)" id="4star">☆</span>
                     <span ng-click="rc.star(rc.recipe._id, 3)" id="3star">☆</span>
