@@ -400,7 +400,7 @@ passport.use(new LocalStrategy(function (username, password, done) {
 passport.use(new GoogleStrategy({
         clientID: "539529748048-ue2jododsf3d4m6gtticj6k5lbapfho0.apps.googleusercontent.com",
         clientSecret: "BFSm5Hr0SMnfRP0z7Mzrv5b0",
-        callbackURL: broveryCallback + "google/callback" // Variable should be broveryCallback for my web server, localCallback for localhost.
+        callbackURL: localCallback + "google/callback" // Variable should be broveryCallback for my web server, localCallback for localhost.
     },
     function (accessToken, refreshToken, profile, done) {
         console.log("google auth");
@@ -415,7 +415,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
         clientID: '1735249653362566',
         clientSecret: '3310f86a10551cf5aa8425b982a9da3d',
-        callbackURL: broveryCallback + "facebook/callback" // Variable should be broveryCallback for my web server, localCallback for localhost.
+        callbackURL: localCallback + "facebook/callback" // Variable should be broveryCallback for my web server, localCallback for localhost.
     },
     function (accessToken, refreshToken, profile, cb) {
         console.log("inside FacebookStrategy");
