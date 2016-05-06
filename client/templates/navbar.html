@@ -26,23 +26,19 @@
                 <li ng-class="{ active: nav.isActive('/about')}">
                     <a ui-sref="about" data-toggle="collapse" data-target=".navbar-collapse.in">About</a></li>
             </ul>
-            <div class="col-sm-4">
-                <div id="imaginary_container">
-                    <div class="input-group stylish-input-group">
-                        <input type="search" class="form-control" ng-blur="nav.blurit()" ng-focus="nav.showSearch=true"  placeholder="Search Ingredient" ng-model="search.ingredients.ingredient">
-                    </div>
-                    <ul ng-show="nav.showSearch">
-                        <div ng-repeat="recipe in nav.recipes.data | filter:search | filter:{private: false}">
-                            <a href="#/{{recipe.$id}}">
-                                <li>
-                                    {{recipe.name}}
-                                </li>
-                            </a>
-                        </div>
-
-                    </ul>
-
+            <div class="col-sm-3">
+                <div class="input-group stylish-input-group">
+                    <input type="search" class="form-control" ng-blur="nav.blurit()" ng-focus="nav.showSearch=true"  placeholder="Search Ingredient" ng-model="search.ingredients.ingredient">
                 </div>
+                <ul ng-show="nav.showSearch">
+                    <div ng-repeat="recipe in nav.recipes.data | filter:search | filter:{private: false}">
+                        <a href="#/{{recipe.$id}}">
+                            <li>
+                                {{recipe.name}}
+                            </li>
+                        </a>
+                    </div>
+                </ul>
             </div>
 
             <!--login drop down-->
