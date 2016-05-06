@@ -34,7 +34,7 @@
         // define functions
         function getRecipes() {
             var apiLocation = location + "getRecipes";
-            $http.get(apiLocation).catch(function (err) {
+            $http.get('/api/getRecipes').catch(function (err) {
                 console.log(err);
             }).then(function (response) {
                 rs.recipes.data = response.data;

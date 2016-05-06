@@ -75,7 +75,7 @@
         }
 
         function addRecipe(recipe) {
-            $http.post(location, recipe).then(function(ref){
+            $http.post('/api/addRecipe', recipe).then(function(ref){
                 // ref.data[0] is the object added to the database. This pushes the same object into the recipes array.
                 recipeService.recipes.data.push(ref.data[0]); 
                 var recipesId = ref.data[0]._id;
