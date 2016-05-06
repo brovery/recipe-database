@@ -34,7 +34,7 @@
         // define functions
         function getRecipes() {
             var apiLocation = location + "getRecipes";
-            $http.get(apiLocation).catch(function (err) {
+            $http.get('/api/getRecipes').catch(function (err) {
                 console.log(err);
             }).then(function (response) {
                 rs.recipes.data = response.data;
@@ -62,18 +62,24 @@
                     console.log("Add failed - recipe is already in your cookbook.");
                 } else {
                     console.log("Recipe added to cookbook.");
+                    rs.cookbook.push(add);
                 }
             });
         }
 
         function removeRecipe(id) {
-            for (var i = 0; i < rs.cookbook.length; i++) {
-                if (rs.cookbook[i].recipe == id) {
-                    rs.cookbook.$remove(rs.cookbook[i]).catch(function (error) {
-                        console.log(error);
-                    });
+            console.log(id);
+
+            $http.post('/api/removeBook', { rec_id: id, user_id: rs.loggedin.user }).then((res) => {
+                console.log(res);
+
+                for (var i = 0; i < rs.cookbook.length; i++) {
+                    if (rs.cookbook[i].rec_id == id) {
+                        console.log("removing recipe from local database.");
+                        rs.cookbook.splice(i, 1);
+                    }
                 }
-            }
+            });
         }
 
         function login() {

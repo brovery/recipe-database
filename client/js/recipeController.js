@@ -57,7 +57,7 @@
                 rec_id: id
             };
 
-            $http.post(mongoRate, newRate).then(function (data) {
+            $http.post('/api/rate', newRate).then(function (data) {
                 getRating(id);
             });
             
@@ -66,9 +66,8 @@
         }
 
         function getRating(key) {
-            var mongoGetRating = 'api/getRating?rec_id=' + key;
+            var mongoGetRating = '/api/getRating?rec_id=' + key;
             $http.get(mongoGetRating).then(function (res) {
-                console.log(res.data.rating);
                 for (var i = 1; i <= 5; i++) {
                     var starId = '#' + i + 'star';
                     $(starId).html('<i class="fa fa-star-o"></i>');
