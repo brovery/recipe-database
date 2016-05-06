@@ -11,13 +11,6 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser');
 
-var http = require('http');
-var port = process.env.port || 1337;
-http.createServer(function(req, res){
-    res.writeHead(200, {'Content-Type':'text/plain'});
-    res.end('Hello World\n');
-}).listen(port);
-
 var url = 'mongodb://localhost:27017/recipes';
 var broveryCallback = 'http://brovery.ddns.net:3000/auth/';
 var localCallback = 'http://localhost:3000/auth/';

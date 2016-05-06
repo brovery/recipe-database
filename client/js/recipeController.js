@@ -43,7 +43,6 @@
         }
 
         function star(id, n) {
-            var mongoRate = 'http://localhost:3000/api/rate';
 
             for (var i = 1; i <= n; i++) {
                 var starId = '#' + i + 'star';
