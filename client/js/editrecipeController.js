@@ -4,13 +4,13 @@
     angular.module('editrecipeController', [])
         .controller('editrecipeController', editrecipeController);
 
-    editrecipeController.$inject = ['recipeService'];
+    editrecipeController.$inject = ['recipeService', '$http', '$location'];
 
-    function editrecipeController(recipeService) {
+    function editrecipeController(recipeService, $http, $location) {
         // list everything
         var ec = this;
         ec.recipes = recipeService.recipes;
-        ec.curRecipe = recipeService.curRecipe;
+        ec.curRecipe = angular.copy(recipeService.curRecipe);
         ec.editRecipe = editRecipe;
 
 
@@ -18,10 +18,13 @@
         // define functions
         function editRecipe() {
             delete ec.curRecipe["rating"];
+            delete ec.curRecipe["_id"];
             ec.curRecipe.userName = recipeService.loggedin.username;
-            recipeService.recipes.$add(ec.curRecipe).then(function(ref) {
-                ec.key = ref.key();
-                recipeService.addtoCookBook(ec.key);
+            
+            $http.post('/api/editRecipe', ec.curRecipe).then((res) => {
+                recipeService.recipes.data.push(res.data[0]);
+                recipeService.addtoCookBook(res.data[0]._id);
+                $location.path("/");
             });
         }
 

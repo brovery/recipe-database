@@ -66,13 +66,14 @@
             if (lc.email !== "" || lc.password !== "") {
                 // call http login service.
                 var loginLoc = location + "login";
-                $http.post(loginLoc, {service: 'password', username: lc.email, password: lc.password}).then((res) => {
+                $http.post('/api/login', {service: 'password', username: lc.email, password: lc.password}).then((res) => {
                     lc.loginHide = true;
                     lc.loginHideNative = true;
                     console.log(res.config.data.username);
                     recipeService.loggedin.username = res.config.data.username;
                     $("#loginDef").css("display", "block");
                     lc.loginName = "Logout";
+                    recipeService.login();
                 }).catch((err) => {
                     console.log('login error:', err);
                 });

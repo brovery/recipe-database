@@ -4,15 +4,16 @@
     angular.module('recipeController', [])
         .controller('recipeController', recipeController);
 
-    recipeController.$inject = ['$http', 'recipeService', 'recipe', '$firebaseArray', '$localStorage', '$interval', '$scope'];
+    recipeController.$inject = ['$http', 'recipeService', 'recipe', '$localStorage'];
 
-    function recipeController($http, recipeService, recipe, $firebaseArray, $localStorage, $interval, $scope) {
+    function recipeController($http, recipeService, recipe, $localStorage) {
         // list everything
         var rc = this;
         var num = 0;
         rc.recipes = recipeService.recipes;
         rc.recipe = recipe;
         rc.loggedin = recipeService.loggedin;
+        rc.cookbook = recipeService.cookbook;
         rc.addToCookBookButton = recipeService.addToCookBookButton;
         rc.initRecipe = initRecipe;
         rc.addtoCookBook = addtoCookBook;
@@ -21,11 +22,9 @@
         rc.getRating = getRating;
         rc.temp = temp;
 
-        console.log(rc.recipe);
-
         if (rc.recipe == undefined) {
-            console.log("hehe");
             rc.recipe = $localStorage.curRecipe;
+            console.log(rc.recipe);
         }
 
         // define functions
@@ -58,28 +57,23 @@
                 rec_id: id
             };
 
-            console.log(newRate);
-
-            $http.post(mongoRate, newRate).then(function (data) {
-                console.log(data);
+            $http.post('/api/rate', newRate).then(function (data) {
+                getRating(id);
             });
             
-            getRating(id);
+
 
         }
 
         function getRating(key) {
-            $interval(function () {
-                recipeService.getRating(key);
-                rc.rating = recipeService.rateTotal;
-
-            }, 800, 3).then(function () {
+            var mongoGetRating = '/api/getRating?rec_id=' + key;
+            $http.get(mongoGetRating).then(function (res) {
                 for (var i = 1; i <= 5; i++) {
                     var starId = '#' + i + 'star';
                     $(starId).html('<i class="fa fa-star-o"></i>');
                     $(starId).css("color", "black");
                 }
-                for (var i = 1; i <= rc.rating.rating; i++) {
+                for (var i = 1; i <= res.data.rating; i++) {
                     var starId = '#' + i + 'star';
                     $(starId).html('<i class="fa fa-star"></i>');
                     $(starId).css("color", "blue");

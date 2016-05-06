@@ -60,21 +60,13 @@
                         controller: "recipeController as rc",
                         resolve: {
                             recipe: function ($stateParams, recipeService, $localStorage, $timeout) {
-                                console.log("recipeService id", recipeService.recipes);
-                                // I had to throw a very short timeout here to allow data to load before it runs this check.
-                                // It's hackery, but it works.
-                                $timeout(function(){
-                                    console.log(recipeService.recipes);
-                                    for (var i = 0; i < recipeService.recipes.data.length; i++) {
-                                        if (recipeService.recipes.data[i]._id == $stateParams.id) {
-                                            $localStorage.curRecipe = recipeService.recipes.data[i];
-                                            return recipeService.recipes.data[i];
-                                        }
+                                // TODO: Get recipe page to load on refresh. Don't use timeout.
+                                for (var i = 0; i < recipeService.recipes.data.length; i++) {
+                                    if (recipeService.recipes.data[i]._id == $stateParams.id) {
+                                        $localStorage.curRecipe = recipeService.recipes.data[i];
+                                        return recipeService.recipes.data[i];
                                     }
-                                }, 5);
-
-
-
+                                }
                             }
                         }
                     });
